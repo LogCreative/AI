@@ -1,6 +1,34 @@
 %&"../ai"
 
 \begin{document}
-    \title{Title}
+    \title{第一次作业}
     \maketitle
+
+    \begin{problem}
+        比较宽度优先算法（BFS）一致代价搜索（UCS）、深度优先算法（DFS）的优劣。
+    \end{problem}
+
+    \begin{problem}
+        说明有信息搜索与无信息搜索的区别。
+    \end{problem}
+
+    \begin{problem}
+        假如我们现在有一个长度为$M$个格子、宽度为$N$个格子的棋盘，盘子中有一些障碍物、形成了一个迷宫。有两个机器人希望根据他们的位置让他们尽快相遇（相遇指的是让两个机器人处在同一个格子里即可，不需要让他们面对面朝向）。机器人在一个行动单位内可以沿着自己朝向的方向移动到一个相邻的格子内、或者旋转自己朝向的方向$90^{\circ}$。
+        \begin{enumerate}
+            \item 请将该问题形式化，我们需要如何简单地定义该问题的状态（state）？
+            \item 对于该状态而言，你定义的状态其状态空间有多大（size）？
+            \item 继续形式化该问题，描述该问题的行动、目标测试、路径耗散（简单描述即可）。
+            \item 如果使用搜索算法解决该问题，请给出一个启发函数$h$，该启发函数满足可接受性$hh$。
+        \end{enumerate}
+    \end{problem}
+
+    \begin{problem}
+        证明以下结论（仅需要简单说明证明思路即可，不用写太多）:
+        \begin{enumerate}
+            \item BFS搜索算法是UCS搜索算法的特殊情况。
+            \item UCS搜索算法是$A^{\ast}$算法的特殊情况。
+            \item 运行$A^{\ast}$算法时，若启发式函数$h$满足一致性，那么在启发式搜索算法的搜索树中每条路径的子节点的$f$值大于等于其父节点。
+            \item 若启发式函数$h$满足一致性，那么它也会满足可接受性。
+        \end{enumerate}
+    \end{problem}
 \end{document}

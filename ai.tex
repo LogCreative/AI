@@ -1,8 +1,84 @@
 
 % Common Header for Artificial Intelligence class.
-\documentclass[]{ctexart}
+% Compile through etex to cache the header.
+% Recipe: recompile header in VS Code
+
+\documentclass[UTF8,12pt,a4paper]{ctexart}
+\usepackage{amsmath,amscd,amsbsy,amssymb,latexsym,url,bm,amsthm}
+\usepackage{epsfig,graphicx,subfigure}
+\usepackage{enumitem,balance}
+\usepackage{wrapfig}
+\usepackage{mathrsfs,euscript}
+\usepackage[usenames]{xcolor}
+\usepackage{hyperref}
+\usepackage[vlined,ruled,linesnumbered]{algorithm2e}
+\hypersetup{colorlinks=true,linkcolor=black}
+\pagestyle{plain}
+
+\linespread{1.3}
+
+\setlength{\oddsidemargin}{-0.365in}
+\setlength{\evensidemargin}{-0.365in}
+\setlength{\topmargin}{-0.3in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textheight}{10.1in}
+\setlength{\textwidth}{7in}
+
+\newtheorem{theorem}{定理}
+\newtheorem{lemma}[theorem]{引理}
+\newtheorem{proposition}[theorem]{命题}
+\newtheorem{corollary}[theorem]{推论}
+\theoremstyle{definition}\newtheorem{problem}{题目}
+\theoremstyle{plain}\newtheorem*{solution}{Solution}
+\newtheorem{definition}{定义}
+
+\makeatletter
+\def\@maketitle{
+    \noindent\framebox[\linewidth]{\shortstack[c]{
+    \Large{\textbf{\@title}}\vspace{1mm}\\
+    人工智能 \quad CS410 \quad 2021年秋季}}
+    \begin{center}
+        \footnotesize{
+            \color{blue} 
+            姓名：\@author \quad 
+            学号：518070910095 \quad 
+            日期：\@date
+        }
+    \end{center}
+    \smallskip
+}
+\renewenvironment{proof}[1][证明]{\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse}
+\renewenvironment{solution}[1][解] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse}
+\makeatother
+
+\usepackage{enumitem}
+\setlist{
+    label=(\arabic*),
+    nosep
+}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+\author{李子龙}
 
 \begin{document}
     \title{第一次作业}
     \maketitle
+    \begin{problem}
+        示例题目
+    \end{problem}
+    \begin{solution}
+        示例解法
+        \begin{definition}
+            示例定义
+        \end{definition}
+        \begin{enumerate}
+            \item 1
+            \item 2
+            \item 3
+        \end{enumerate}
+    \end{solution}
 \end{document}
