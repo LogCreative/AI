@@ -1,1 +1,9 @@
 book/
+
+*.fmt
+*.log
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+tutorial*
