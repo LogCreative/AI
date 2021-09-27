@@ -7,3 +7,4 @@ book/
 *.fls
 *.synctex.gz
 tutorial*
+*.out
