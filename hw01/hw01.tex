@@ -43,7 +43,7 @@
             \item 请将该问题形式化，我们需要如何简单地定义该问题的状态（state）？
             \item 对于该状态而言，你定义的状态其状态空间有多大（size）？
             \item 继续形式化该问题，描述该问题的行动、目标测试、路径耗散（简单描述即可）。
-            \item 如果使用搜索算法解决该问题，请给出一个启发函数$h$，该启发函数满足可接受性$hh$。
+            \item 如果使用搜索算法解决该问题，请给出一个启发函数$h$，该启发函数满足可接受性。
         \end{enumerate}
     \end{problem}
 
@@ -52,11 +52,11 @@
             \item 两个机器人所处的位置、朝向。
             \item 由于每个机器人的朝向可以有4个，所以状态空间的大小为
             \begin{equation*}
-                (4MN)^2=16M^2N^2
+                (4^{MN})^2=16^{MN}
             \end{equation*}
-            但是棋盘中可能会有障碍物，所以状态空间大小会小于等于上面的值。更确切地说，如果棋盘中有$p$个无障碍物位置（$p\leq MN$），则状态空间的大小就是
+            但是棋盘中可能会有障碍物，所以状态空间大小会小于等于上面的值。更确切地说，如果棋盘中有$p$个无障碍物位置，则状态空间的大小就是
             \begin{equation*}
-                (4p)^2=16p^2
+                16^p \quad (p\leq MN)
             \end{equation*}
             \item 
             \begin{description}
@@ -69,7 +69,7 @@
                 \end{figure} 
                 而路径耗散就是对这个转换后的状态图上的每一条边设置一个1的权值。
             \end{description}
-            \item 启发函数
+            \item 启发函数$h$被定义为两个机器人之间的曼哈顿距离。这个函数满足可接受性，因为机器人不能斜着走，中间有障碍会导致其行动比这个距离长，而且还需要考虑转向也会需要更多的路径耗散。
         \end{enumerate}
     \end{solution}
 
@@ -82,4 +82,42 @@
             \item 若启发式函数$h$满足一致性，那么它也会满足可接受性。
         \end{enumerate}
     \end{problem}
+
+    \begin{proof}
+        \begin{enumerate}
+            \item 当UCS的路径消耗的单步耗散都是1时，为BFS算法。
+            \item 当$A^\ast$算法的启发函数$h(n)=0$时，为UCS算法。
+            \item 假设$n^\prime$是结点$n$的后继。启发式函数$h$满足一致性，则
+            \begin{equation}\label{eq:con}
+                h(n)\leq c(n,a,n^\prime)+h(n^\prime)
+            \end{equation}
+            而路径代价需要花费单步代价
+            \begin{equation*}
+                g(n^\prime)=g(n)+c(n,a,n^\prime)
+            \end{equation*}
+            则代价
+            \begin{equation*}
+                f(n^\prime) = g(n^\prime) + h(n^\prime) = g(n)+c(n,a,n^\prime)+h(n)\geq g(n)+h(n) = f(n)
+            \end{equation*}
+            \item 
+            % 考虑目标节点的代价，到达目标节点的启发函数为零
+            % \begin{equation*}
+            %     f(s^\prime) = g(s^\prime)
+            % \end{equation*}
+            % 由（3）所证明，$f$在后继结点上的值总是会大于等于其父节点，所以对于路径上的任意一点$n$，都会有
+            % \begin{equation*}
+            %     f(s^\prime) \geq f(n)
+            % \end{equation*}
+            % 结合上述两个式子，会有
+            % \begin{equation*}
+            %     g(s^\prime)\geq f(n)
+            % \end{equation*}
+            % 也即$f(n)$永远不会超过结点$n$的解的实际代价，也即满足可接受性。
+            $h$满足一致性，也即满足式\eqref{eq:con}。考虑结点$n$的实际代价所对应的路径不等式累加，
+            \begin{equation*}
+                h(n)\leq\sum_{\rm path} c(i,a,i^\prime) + 0
+            \end{equation*}
+            （目标节点的启发函数为0。）而式子右边就是实际代价，也就证明了$h$满足可接受性——不会超过实际代价。
+        \end{enumerate}
+    \end{proof}
 \end{document}
