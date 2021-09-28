@@ -8,3 +8,7 @@ book/
 *.synctex.gz
 tutorial*
 *.out
+*.preview*
+cache/
+*.auxlock
+*.dpth

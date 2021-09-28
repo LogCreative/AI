@@ -8,6 +8,7 @@
 \usepackage{epsfig,graphicx,subfigure}
 \usepackage{enumitem,balance}
 \usepackage{wrapfig}
+\usepackage{array,float,booktabs}
 \usepackage{mathrsfs,euscript}
 \usepackage[usenames]{xcolor}
 \usepackage{hyperref}
@@ -53,14 +54,13 @@
 \makeatother
 
 \usepackage{enumitem}
-\setlist{
-    label=(\arabic*),
-    nosep
-}
+\setlist{nosep}
+\setlist[enumerate]{label=(\arabic*)}
 
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest}
+\usetikzlibrary{external}
 
 \author{李子龙}
 
@@ -80,5 +80,6 @@
             \item 2
             \item 3
         \end{enumerate}
+        \input{hw01/fig/deduction.tex}
     \end{solution}
 \end{document}
