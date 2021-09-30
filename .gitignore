@@ -12,3 +12,4 @@ tutorial*
 cache/
 *.auxlock
 *.dpth
+ref/
