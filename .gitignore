@@ -12,4 +12,10 @@ tutorial*
 cache/
 *.auxlock
 *.dpth
+*.exe
+*.bbl
+*.blg
+*.toc
+*.bak
+*.sav
 ref/

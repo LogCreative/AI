@@ -6,4 +6,59 @@
     % 2）不同算法的搜索结果；
     % 3）不同算法的运行时间；
     % 4）复杂度分析。
+
+    \tableofcontents
+    \clearpage
+
+    \section{题目}
+
+    \subsection{Topic}
+
+    Implement three algorithms to solve multiple sequence alignment (MSA) problems.
+
+    \subsection{Requirements}
+
+    \begin{enumerate}
+        \item Implement dynamic programming (DP) algorithm to find the optimal solution.
+        \item Implement A-star (A$^\ast$) algorithm to find the optimal solution.
+        \item Implement genetic algorithm to find the optimal/suboptimal solution.
+    \end{enumerate}
+
+    \subsection{Rules}
+
+    \begin{table}[H]
+        \centering
+        \caption{Cost Matrix}\label{tab:costmat}
+        \begin{tabular}{cccc}
+            \toprule
+                & Match $\alpha_{pp}$ & Mismatch $\alpha_{pq}$ & Gap $\delta$ \\
+            \midrule
+            Cost & 0 & 3 & 2 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    The table above shows the pairwise cost matrix. For multiple sequence alignment, the cost should be calculated in a cycle pairwise manner. Note that GAP-GAP is a match and should be considered as 0 cost. For every query, find the best alignment(s) in the database with the lowest cost.
+
+    \section{动态规划算法}
+
+    在算法与复杂性课程\cite{algcom}里，已经提到了双序列比对的动态规划算法。
+
+    \begin{algorithm}[H]
+        \caption{双序列比对动态规划 MSA}
+        \KwIn{$x_1x_2\cdots x_m, y_1y_2\cdots y_n,\alpha,\delta$}
+        \KwOut{}
+        \BlankLine
+        \lFor{$i\leftarrow 0$ to $m$}{$M[i,0]=i\delta$}
+        \lFor{$j\leftarrow 0$ to $n$}{$M[0,j]=j\delta$}
+        \For{$i\leftarrow 1$ to $m$}{
+            \For{$j\leftarrow 1$ to $n$}{
+                $M[i,j]=\min(\alpha[x_i,y_j] + M[i-1,j-1], \delta + M[i-1,j], \delta + M[i,j-1])$\;
+            }
+        }
+        \Return{$M[m,n]$}\;
+    \end{algorithm}
+
+    \bibliography{ref}
+
 \end{document}
