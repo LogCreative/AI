@@ -31,7 +31,7 @@
         \caption{Cost Matrix}\label{tab:costmat}
         \begin{tabular}{cccc}
             \toprule
-                & Match $\alpha_{pp}$ & Mismatch $\alpha_{pq}$ & Gap $\delta$ \\
+                & Match $\alpha(p,p)$ & Mismatch $\alpha(p,q)$ & Gap $\delta$ \\
             \midrule
             Cost & 0 & 3 & 2 \\
             \bottomrule
@@ -42,10 +42,10 @@
 
     \section{动态规划算法}
 
-    在算法与复杂性课程\cite{algcom}里，已经提到了双序列比对的动态规划算法。
+    在算法与复杂性课程\cite{algcom}里，已经提到了双序列比对的动态规划算法，如图 \ref{fig:pairwisedp} 所示，双序列比对对于一个状态只需要考虑三个临近状态的转移，分别是对齐$\alpha$，间隔 $\delta_x$、$\delta_y$，转换行动如表 \ref{tab:pairwise} 所示。对于每一个状态，都需要考虑经过哪一条路径消耗最小，于是就有了如算法 \ref{alg:pairwise} 的动态规划状态转移方程。
 
     \begin{algorithm}[H]
-        \caption{双序列比对动态规划 MSA}
+        \caption{双序列比对动态规划 MSA}\label{alg:pairwise}
         \KwIn{$x_1x_2\cdots x_m, y_1y_2\cdots y_n,\alpha,\delta$}
         \KwOut{}
         \BlankLine
@@ -58,6 +58,73 @@
         }
         \Return{$M[m,n]$}\;
     \end{algorithm}
+
+    \begin{minipage}{0.48\textwidth}
+        \begin{table}[H]
+            \centering
+            \caption{双序列行动坐标变换表}\label{tab:pairwise}
+            \begin{tabular}{crr}
+                \toprule
+                    & $i$ & $j$ \\
+                \midrule
+                $\alpha$ & $+1$ & $+1$ \\
+                $\delta_x$ & $0$ & $+1$ \\
+                $\delta_y$ & $+1$ & $0$ \\
+                \bottomrule
+            \end{tabular}
+        \end{table}
+    \end{minipage}\hfil
+    \begin{minipage}{0.48\textwidth}
+        \begin{figure}[H]
+            \centering
+            \input{fig/pairwise_dp.tex}
+            \caption{双序列比对}\label{fig:pairwisedp}
+        \end{figure}
+    \end{minipage}
+    \medskip
+    
+    对于三序列比对，情况就复杂地多，需要同时考虑七条路径。
+
+    \begin{minipage}{0.48\textwidth}
+        \begin{table}[H]
+            \centering
+            \caption{三序列行动坐标变换表}\label{tab:multiple}
+            \begin{tabular}{crrr}
+                \toprule
+                    & $i$ & $j$ & $k$ \\
+                \midrule
+                $\delta_x\delta_y\alpha_z$ & 0 & 0 & 1\\
+                $\delta_x\alpha_y\delta_z$ & 0 & 1 & 0 \\
+                $\delta_x\alpha_y\alpha_z$ & 0 & 1 & 1 \\
+                $\alpha_x\delta_y\delta_z$ & 1 & 0 & 0 \\
+                $\alpha_x\delta_y\alpha_z$ & 1 & 0 & 1 \\
+                $\alpha_x\alpha_y\delta_z$ & 1 & 1 & 0 \\
+                $\alpha_x\alpha_y\alpha_z$ & 1 & 1 & 1 \\
+                \bottomrule
+            \end{tabular}
+        \end{table}
+    \end{minipage}\hfil
+    \begin{minipage}{0.48\textwidth}
+        \begin{figure}[H]
+            \centering
+            \input{fig/multiple_dp.tex}
+            \caption{三序列比对}\label{fig:multipledp}
+        \end{figure}
+    \end{minipage}
+    \medskip
+
+    可以统一化为多序列比对问题。对于 $l$ 条序列比对，其行动转换方法可以被表示为二进制从 $(\underbrace{0\cdots01}_{l\text{ digits}})_2$ 到 $(\underbrace{1\cdots11}_{l\text{ digits}})_2$ 内所有的数，计算损耗使用上三角成对比较，规则统一为
+    \begin{equation*}
+        \texttt{compare}=
+        \begin{cases}
+            0,& (-,-) \| (p,p) \\
+            2,& (p,-) \| (-,q) \\
+            3,& (p,q)
+        \end{cases}
+    \end{equation*}
+    并在确定每一次行动后记录路径，最后回溯路径到原点。
+
+    % 29s
 
     \bibliography{ref}
 
