@@ -16,7 +16,7 @@ def comparelist(cs):
     # cyclic compare
     res = 0
     for i in range(len(cs)):
-        for j in range(i,len(cs)):
+        for j in range(i+1,len(cs)):
             res += compare(cs[i],cs[j])
     return res
 
@@ -40,7 +40,7 @@ def visit(_list, _indices):
         wrapper_ = wrapper_[_index]
     return wrapper_
 
-def editDistanceDP(S:list, dist = [], move= []):
+def editDistanceDP(S):
     # Initialize l edges.
     # Example: 3 strings
     #     |dist[0][0][k]|  dist[0][j][0] dist[i][0][0]
@@ -105,14 +105,41 @@ def editDistanceDP(S:list, dist = [], move= []):
                     move_appender = [move_appender]
                 dist_wrapper.extend(dist_appender)                    
                 move_wrapper.extend(move_appender)
-    print(dist)
-    print(move)
+    return visit(dist,[len(s) for s in S]),move
 
 def alignmentDP(S:list):
-    dist = []
-    move = []
-    cost = editDistanceDP(S,dist,move)
+    cost,move = editDistanceDP(S)
 
     path = []
+    pos = [len(s) for s in S]
+    start = [0 for i in range(len(S))]
+    while not pos == start:
+        prev_move = visit(move,pos)
+        path.insert(0,prev_move)
+        pos = [a-b for a,b in zip(pos,prev_move)]
 
-editDistanceDP(["AAAAAA","BBBB","CCC"])
+    S_ = ["" for i in range(len(S))]
+    for path_move in path:
+        for axis,axis_move in enumerate(path_move):
+            if axis_move==0:
+                S_[axis] += "-"
+            else:
+                S_[axis] += S[axis][0]
+                S[axis] = S[axis][1:]
+    return S_
+
+with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
+    with open(curdir + "multiple_dp.txt","w") as of:
+        for pq in pqs:
+            minindex = 0
+            mincost = math.inf
+            for d in range(len(targets)):
+                pbar.set_description('Process: ' + pq[:10] + ' & ' + targets[d][:10])
+                cost,move = editDistanceDP([pq,targets[d]])
+                if cost < mincost:
+                    minindex = d
+                    mincost = cost
+                pbar.update(1)
+            of.write('\n'.join(alignmentDP([pq,targets[minindex]])))
+            of.write('\n'+str(mincost)+"\n\n")
+    pbar.set_description("Finish")
