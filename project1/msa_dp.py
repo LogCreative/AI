@@ -1,3 +1,4 @@
+import enum
 import os, math
 from tqdm import tqdm       # pip install tqdm
 
@@ -29,7 +30,9 @@ with open(curdir + "MSA_database.txt") as df:
 #   gap_y:      1       v
 #   gap_x:     -1       >
 
-def editDistanceDP(x:str, y:str, dist = [], move = []):
+def editDistanceDP(x:str, y:str):
+    dist = []
+    move = []
     for i in range(len(x)+1):
         dist.append([i*delta])
         move.append([1])
@@ -56,12 +59,10 @@ def editDistanceDP(x:str, y:str, dist = [], move = []):
                 else:
                     dist[i].append(gap_y)
                     move[i].append(1)
-    return dist[len(x)][len(y)]
+    return dist[len(x)][len(y)],move
 
 def alignmentDP(_x:str, _y:str):
-    dist = []
-    move = []
-    cost = editDistanceDP(_x,_y,dist,move)
+    cost,move = editDistanceDP(_x,_y)
 
     path = []
     i, j = len(_x), len(_y)
@@ -98,12 +99,12 @@ with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str
         for pq in pqs:
             minindex = 0
             mincost = math.inf
-            for d in range(len(targets)):
-                pbar.set_description('Process: ' + pq[:10] + ' & ' + targets[d][:10])
-                cost = editDistanceDP(pq,targets[d])
-                if cost < mincost:
+            for d,tg in enumerate(targets):
+                pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
+                pcost,mov = editDistanceDP(pq,tg)
+                if pcost < mincost:
                     minindex = d
-                    mincost = cost
+                    mincost = pcost
                 pbar.update(1)
             of.write(alignmentDP(pq,targets[minindex]))
             of.write(str(mincost)+"\n\n")

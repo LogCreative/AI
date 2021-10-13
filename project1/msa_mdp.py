@@ -129,16 +129,16 @@ def alignmentDP(S:list):
     return S_
 
 with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-    with open(curdir + "multiple_dp.txt","w") as of:
+    with open(curdir + "pairwise_dp.txt","w") as of:
         for pq in pqs:
             minindex = 0
             mincost = math.inf
-            for d in range(len(targets)):
-                pbar.set_description('Process: ' + pq[:10] + ' & ' + targets[d][:10])
-                cost,move = editDistanceDP([pq,targets[d]])
-                if cost < mincost:
+            for d,tg in enumerate(targets):
+                pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
+                pcost,mov = editDistanceDP([pq,tg])
+                if pcost < mincost:
                     minindex = d
-                    mincost = cost
+                    mincost = pcost
                 pbar.update(1)
             of.write('\n'.join(alignmentDP([pq,targets[minindex]])))
             of.write('\n'+str(mincost)+"\n\n")
