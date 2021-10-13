@@ -1,5 +1,7 @@
 import os, math
+from concurrent.futures import ThreadPoolExecutor, ALL_COMPLETED, wait
 from tqdm import tqdm       # pip install tqdm
+import time, datetime
 
 ####### Rule #######
 
@@ -128,6 +130,7 @@ def alignmentDP(S:list):
                 S[axis] = S[axis][1:]
     return S_
 
+##### Cross check #####
 # with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
 #     with open(curdir + "mdp_pq.txt","w") as of:
 #         for pq in pqs:
@@ -144,19 +147,47 @@ def alignmentDP(S:list):
 #             of.write('\n'+str(mincost)+"\n\n")
 #     pbar.set_description("Finish")
 
-with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
-    with open(curdir + "mdp_mq.txt","w") as of:
-        for mq in mqs:
-            minindex = (0,0)
-            mincost = math.inf
-            for i in range(len(targets)):
-                for j in range(i+1,len(targets)):
-                    pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
-                    pcost,mov = editDistanceDP([mq,targets[i],targets[j]])
-                    if pcost < mincost:
-                        minindex = (i,j)
-                        mincost = pcost
-                    pbar.update(1)
-            of.write('\n'.join(alignmentDP([mq,targets[minindex[0]],targets[minindex[1]]])))
-            of.write('\n'+str(mincost)+"\n\n")
-    pbar.set_description("Finish")
+total=len(mqs)*len(targets)*(len(targets)-1)/2
+current = 0
+
+minindex = ()
+mincost = math.inf
+
+logf = open(curdir + "mdp.log","w")
+logf.write("Start" + '\n')
+logf.close()
+
+start = time.process_time()
+
+def log(msg):
+    global current
+    logf = open(curdir + "mdp.log","a")
+    logf.write('[' + str(current) + '/' + str(int(total)) + '] ' + str(datetime.timedelta(seconds=time.process_time() - start)) + msg + '\n')
+    logf.close()
+
+def processStrings(mid, tids):
+    global minindex,mincost,minalignment,current
+    log(str(mid) + ' & ' + str (tids) + ' START ')
+    pcost = editDistanceDP([mqs[mid]]+[targets[tid] for tid in tids])[0]
+    if pcost < mincost:
+        minindex = tids
+        mincost = pcost
+    current += 1
+    log(str(mid) + ' & ' + str (tids) + ' FINISH ' + str(pcost) + '/' + str(mincost))
+
+of = open(curdir + "mdp_mq.txt",'w')
+of.close()
+
+with ThreadPoolExecutor(max_workers=8) as executer:
+    for mid in range(len(mqs)):
+        minindex = ()
+        mincost = math.inf
+        all_task = [executer.submit(processStrings, mid, [i,j]) 
+            for i in range(len(targets)) 
+            for j in range(i+1,len(targets))]
+        wait(all_task, return_when=ALL_COMPLETED)
+        of = open(curdir + "mdp_mq.txt","a")
+        of.write('\n'.join(alignmentDP([mqs[mid]]+[targets[tid] for tid in minindex])))
+        of.write('\n'+str(mincost)+"\n\n")
+        of.close()
+    log(' ALL FINISHED! ')
