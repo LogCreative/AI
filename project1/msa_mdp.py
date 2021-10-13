@@ -27,7 +27,7 @@ curdir = os.path.dirname(__file__) + "/"
 with open(curdir + "MSA_query.txt") as qf:
     queries = qf.read()
     pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
-    mps = queries[queries.find('3\n')+len('3\n'):].splitlines()
+    mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
 
 with open(curdir + "MSA_database.txt") as df:
     targets = df.read().splitlines()
@@ -129,7 +129,7 @@ def alignmentDP(S:list):
     return S_
 
 with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-    with open(curdir + "pairwise_dp.txt","w") as of:
+    with open(curdir + "mdp_pq.txt","w") as of:
         for pq in pqs:
             minindex = 0
             mincost = math.inf
@@ -140,6 +140,23 @@ with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str
                     minindex = d
                     mincost = pcost
                 pbar.update(1)
+            of.write('\n'.join(alignmentDP([pq,targets[minindex]])))
+            of.write('\n'+str(mincost)+"\n\n")
+    pbar.set_description("Finish")
+
+with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
+    with open(curdir + "mdp_mq.txt","w") as of:
+        for mq in mqs:
+            minindex = 0
+            mincost = math.inf
+            for i in range(len(targets)):
+                for j in range(i+1,len(targets)):
+                    pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
+                    pcost,mov = editDistanceDP([pq,targets[i],targets[j]])
+                    if pcost < mincost:
+                        minindex = d
+                        mincost = pcost
+                    pbar.update(1)
             of.write('\n'.join(alignmentDP([pq,targets[minindex]])))
             of.write('\n'+str(mincost)+"\n\n")
     pbar.set_description("Finish")

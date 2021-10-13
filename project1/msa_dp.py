@@ -18,7 +18,7 @@ curdir = os.path.dirname(__file__) + "/"
 with open(curdir + "MSA_query.txt") as qf:
     queries = qf.read()
     pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
-    mps = queries[queries.find('3\n')+len('3\n'):].splitlines()
+    mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
 
 with open(curdir + "MSA_database.txt") as df:
     targets = df.read().splitlines()
@@ -95,7 +95,7 @@ def alignmentDP(_x:str, _y:str):
     return x_ + '\n' + y_ + '\n'
 
 with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-    with open(curdir + "pairwise_dp.txt","w") as of:
+    with open(curdir + "dp_pq.txt","w") as of:
         for pq in pqs:
             minindex = 0
             mincost = math.inf
