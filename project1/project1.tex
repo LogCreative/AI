@@ -1,4 +1,6 @@
 %&"../ai"
+\endofdump
+\tikzexternalize[prefix=cache/]{project1}
 \begin{document}
     \title{项目一：MSA}
     \maketitle
@@ -42,12 +44,14 @@
 
     \section{动态规划算法}
 
+    \subsection{双序列比对}
+
     在算法与复杂性课程\cite{algcom}里，已经提到了双序列比对的动态规划算法，如图 \ref{fig:pairwisedp} 所示，双序列比对对于一个状态只需要考虑三个临近状态的转移，分别是对齐$\alpha$，间隔 $\delta_x$、$\delta_y$，转换行动如表 \ref{tab:pairwise} 所示。对于每一个状态，都需要考虑经过哪一条路径消耗最小，于是就有了如算法 \ref{alg:pairwise} 的动态规划状态转移方程。
 
     \begin{algorithm}[H]
         \caption{双序列比对动态规划 MSA}\label{alg:pairwise}
         \KwIn{$x_1x_2\cdots x_m, y_1y_2\cdots y_n,\alpha,\delta$}
-        \KwOut{}
+        \KwOut{最小损耗}
         \BlankLine
         \lFor{$i\leftarrow 0$ to $m$}{$M[i,0]=i\delta$}
         \lFor{$j\leftarrow 0$ to $n$}{$M[0,j]=j\delta$}
@@ -83,6 +87,8 @@
     \end{minipage}
     \medskip
     
+    \subsection{多序列比对}
+
     对于三序列比对，情况就复杂地多，需要同时考虑七条路径。
 
     \begin{minipage}{0.48\textwidth}
@@ -113,7 +119,7 @@
     \end{minipage}
     \medskip
 
-    可以统一化为多序列比对问题。对于 $l$ 条序列比对，其行动转换方法可以被表示为二进制从 $(\underbrace{0\cdots01}_{l\text{ digits}})_2$ 到 $(\underbrace{1\cdots11}_{l\text{ digits}})_2$ 内所有的数，计算损耗使用上三角成对比较，规则统一为
+    可以统一化为多序列比对问题。对于 $L$ 条序列比对，首先需要递归地初始化低维度边缘（如图 \ref{fig:downdim} 所示），之后余下空间其行动转换方法可以被表示为二进制从 $(\underbrace{0\cdots01}_{L\text{ digits}})_2$ 到 $(\underbrace{1\cdots11}_{L\text{ digits}})_2$ 内所有的数（最低位为第一维度），计算损耗使用上三角成对比较，规则统一为
     \begin{equation*}
         \texttt{compare}=
         \begin{cases}
@@ -124,13 +130,51 @@
     \end{equation*}
     并在确定每一次行动后记录路径，最后回溯路径到原点。
 
+    \begin{figure}[H]
+        \centering
+        \input{fig/dp_downdim.tex}
+        \caption{降维递归}\label{fig:downdim}
+    \end{figure}
+
     % 29s
     % > 24h
     % 8 核多线程进行中
 
+    几乎类似于双序列比对，下面是 \verb"numpy" 实现版本，虽然其速度没有使用 Python 内置的 \verb"list" 版本（\href{./msa\_mdp.py}{\ttfamily msa\_mdp.py}）的快，但是代码可读性已经与伪代码相当。
+
+    \codeseg[language=python]{msa\_ndp.py}{44}{86}
+
+    \subsection{运行时间}
+
+    如果字符串平均长度为 $l$，该算法 $L$ 维字符串的复杂度为：
+    \begin{equation*}
+        O_S = \prod_{i=1}^L \texttt{len}(S[i]) \approx l^L
+    \end{equation*}
+
+    对于该问题，有 $m$ 个待比对序列，$n$ 个数据库项目，总时间复杂度为：
+    \begin{equation*}
+        mC_{n}^{L-1}O_S \approx mC_{n}^{L-1}l^L
+    \end{equation*}
+
+    实际运行时间如表 \ref{tab:dp}，在服务器上运行时间如下。
+
+    \begin{table}[h]
+        \centering
+        \caption{动态规划运行时间}\label{tab:dp}
+        \begin{tabular}{cb{3cm}b{3cm}b{3cm}b{3cm}}
+            \toprule
+             &\multicolumn{2}{c}{\bfseries 双序列}  &\multicolumn{2}{c}{\bfseries 三序列} \\
+             \cmidrule(r){2-3}\cmidrule(r){4-5} 
+             & \bfseries 朴素实现 \href{./msa\_dp.py}{\ttfamily msa\_dp.py} &\bfseries \verb"list"实现 \href{./msa\_mdp.py}{\ttfamily msa\_mdp.py} &\bfseries \verb"list" 实现 \href{./msa\_mdp.py}{\ttfamily msa\_mdp.py} &\bfseries \verb"numpy" 实现 \href{./msa\_ndp.py}{\ttfamily msa\_ndp.py} \\
+            \midrule
+            运行时间 & 29s & 1min & 24h & $\sim$36h \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
     \section{A* 算法}
 
-    
+    使用启发函数 $g(n) = |\texttt{len}(S_1)-\texttt{len}(S_2)|$。
 
     
 
