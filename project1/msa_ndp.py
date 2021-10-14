@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from tqdm import tqdm
 
 ##### Rule #####
 
@@ -37,6 +38,9 @@ with open(curdir + "MSA_database.txt") as df:
 # move will be encoded as binary, support up to 8 strings comparsion.
 # REMEMBER: the dimension has len + 1 length!
 
+def decodeMove(m:np.uint8,dim):
+    return tuple(1 if m & (2**v) > 0 else 0 for v in range(dim))
+
 def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
     L = len(S)
     if L == 1:
@@ -69,11 +73,11 @@ def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
         minmove = np.uint8(0)
         minvalue = np.inf
         for m in range(1,2**L):
-            move_vec = tuple(1 if m & (2**v) > 0 else 0 for v in range(L))
+            move_vec = decodeMove(m,L)
             prev_pos = tuple(a-b for a,b in zip(pos,move_vec))
             penalty = comparelist([S[a][p] if move_vec[a]==1 else "-" for a,p in enumerate(prev_pos)])
             moved_dist = dist[prev_pos] + penalty
-            if moved_dist < np.inf:
+            if moved_dist < minvalue:
                 minmove = m
                 minvalue = moved_dist
         it[0] = minvalue
@@ -81,5 +85,46 @@ def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
         it.iternext()
     return dist, move
 
+def alignmentDP(S):
+    dist, move = editDistanceDP(S)
+
+    path = []
+    pos = tuple(len(s) for s in S)
+    cost = dist[pos]
+    start = tuple(0 for i in range(len(S)))
+    while not pos == start:
+        prev_move = decodeMove(move[pos],len(S))
+        path.insert(0,prev_move)
+        pos = tuple(a-b for a,b in zip(pos,prev_move))
+
+    S_ = ["" for i in range(len(S))]
+    for path_move in path:
+        for axis,axis_move in enumerate(path_move):
+            if axis_move==0:
+                S_[axis] += "-"
+            else:
+                S_[axis] += S[axis][0]
+                S[axis] = S[axis][1:]
+    return S_
+
 # 降维编程
-print(editDistanceDP(["AAAA","BBB"]))
+# print(alignmentDP(["AAAA","BBB"]))
+
+with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
+    with open(curdir + "mdp_pq.txt","w") as of:
+        for pq in pqs:
+            minindex = 0
+            mincost = np.inf
+            for d,tg in enumerate(targets):
+                pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
+                S = [pq,tg]
+                dist,move = editDistanceDP(S)
+                fin = tuple(len(s) for s in S)
+                pcost = dist[fin]
+                if pcost < mincost:
+                    minindex = d
+                    mincost = pcost
+                pbar.update(1)
+            of.write('\n'.join(alignmentDP([pq,targets[minindex]])))
+            of.write('\n'+str(mincost)+"\n\n")
+    pbar.set_description("Finish")
