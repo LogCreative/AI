@@ -107,24 +107,44 @@ def alignmentDP(S):
                 S[axis] = S[axis][1:]
     return S_
 
-# 降维编程
 # print(alignmentDP(["AAAA","BBB"]))
 
-with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-    with open(curdir + "mdp_pq.txt","w") as of:
-        for pq in pqs:
-            minindex = 0
+# Cross check
+# with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
+#     with open(curdir + "ndp_pq.txt","w") as of:
+#         for pq in pqs:
+#             minindex = 0
+#             mincost = np.inf
+#             for d,tg in enumerate(targets):
+#                 pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
+#                 S = [pq,tg]
+#                 dist,move = editDistanceDP(S)
+#                 fin = tuple(len(s) for s in S)
+#                 pcost = dist[fin]
+#                 if pcost < mincost:
+#                     minindex = d
+#                     mincost = pcost
+#                 pbar.update(1)
+#             of.write('\n'.join(alignmentDP([pq,targets[minindex]])))
+#             of.write('\n'+str(mincost)+"\n\n")
+#     pbar.set_description("Finish")
+
+with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
+    with open(curdir + "ndp_mq.txt","w") as of:
+        for mq in mqs:
+            minindex = (0,0)
             mincost = np.inf
-            for d,tg in enumerate(targets):
-                pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
-                S = [pq,tg]
-                dist,move = editDistanceDP(S)
-                fin = tuple(len(s) for s in S)
-                pcost = dist[fin]
-                if pcost < mincost:
-                    minindex = d
-                    mincost = pcost
-                pbar.update(1)
-            of.write('\n'.join(alignmentDP([pq,targets[minindex]])))
+            for i in range(len(targets)):
+                for j in range(i+1,len(targets)):
+                    pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
+                    S = [mq,targets[i],targets[j]]
+                    dist,move = editDistanceDP(S)
+                    fin = tuple(len(s) for s in S)
+                    pcost = dist[fin]
+                    if pcost < mincost:
+                        minindex = (i,j)
+                        mincost = pcost
+                    pbar.update(1)
+            of.write('\n'.join(alignmentDP([mq,targets[minindex[0]],targets[minindex[1]]])))
             of.write('\n'+str(mincost)+"\n\n")
     pbar.set_description("Finish")

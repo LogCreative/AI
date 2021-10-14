@@ -130,7 +130,7 @@ def alignmentDP(S:list):
                 S[axis] = S[axis][1:]
     return S_
 
-##### Cross check #####
+# #### Cross check #####
 # with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
 #     with open(curdir + "mdp_pq.txt","w") as of:
 #         for pq in pqs:
