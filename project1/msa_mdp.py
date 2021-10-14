@@ -164,7 +164,7 @@ def log(msg):
     logf = open(curdir + "mdp.log","a")
     logf.write('[' + str(current) + '/' + str(int(total)) + '] ' + str(datetime.timedelta(seconds=int(time.process_time() - start))) + ' ' + msg + '\n')
     logf.close()
-
+  
 def processStrings(mid, tids):
     global minindex,mincost,minalignment,current
     log(str(mid) + ' & ' + str (tids) + ' START ')

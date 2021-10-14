@@ -91,12 +91,12 @@
             \caption{三序列行动坐标变换表}\label{tab:multiple}
             \begin{tabular}{crrr}
                 \toprule
-                    & $i$ & $j$ & $k$ \\
+                    & $k$ & $j$ & $i$ \\
                 \midrule
-                $\delta_x\delta_y\alpha_z$ & 0 & 0 & 1\\
+                $\alpha_x\delta_y\delta_z$  & 0 & 0 & 1\\
                 $\delta_x\alpha_y\delta_z$ & 0 & 1 & 0 \\
                 $\delta_x\alpha_y\alpha_z$ & 0 & 1 & 1 \\
-                $\alpha_x\delta_y\delta_z$ & 1 & 0 & 0 \\
+                $\delta_x\delta_y\alpha_z$ & 1 & 0 & 0 \\
                 $\alpha_x\delta_y\alpha_z$ & 1 & 0 & 1 \\
                 $\alpha_x\alpha_y\delta_z$ & 1 & 1 & 0 \\
                 $\alpha_x\alpha_y\alpha_z$ & 1 & 1 & 1 \\
@@ -126,6 +126,7 @@
 
     % 29s
     % > 24h
+    % 8 核多线程进行中
 
     \section{A* 算法}
 
