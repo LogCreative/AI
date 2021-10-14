@@ -55,11 +55,31 @@ def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
         slicer = tuple(0 if i==s else slice(None) for i in range(L)) # slice(None) stands for : symbol
         dist[slicer], move[slicer] = editDistanceDP(S[0:s]+S[s+1:L], dist[slicer], move[slicer]) # skip S[s]
         # configure move, insert 0 in the corresponding bit
-        # Example: 4-dim xyzw xyw cube z(2) = 0, get an move 111(wyx), but with that be zero, it should be 1011
+        # Example: 4-dim xyzw xyw cube z(2) = 0, get an move 111(wyx), but with that be zero, it should be 1011.
+        # REMEMBER to place the right end in the same level!
         move[slicer] = (move[slicer] >> s << (s+1)) + (move[slicer] & (2**s-1))
     # Spread the remaining space, since the edge case has been considered, the remaining space will have the same action set.
-    
+    it = np.nditer(dist, flags=['multi_index'], op_flags=["readwrite"])
+    while not it.finished:
+        pos = it.multi_index
+        if 0 in pos:
+            it.iternext()
+            continue    # calculated
+        ## The range of available move is 1~(2^L-1)
+        minmove = np.uint8(0)
+        minvalue = np.inf
+        for m in range(1,2**L):
+            move_vec = tuple(1 if m & (2**v) > 0 else 0 for v in range(L))
+            prev_pos = tuple(a-b for a,b in zip(pos,move_vec))
+            penalty = comparelist([S[a][p] if move_vec[a]==1 else "-" for a,p in enumerate(prev_pos)])
+            moved_dist = dist[prev_pos] + penalty
+            if moved_dist < np.inf:
+                minmove = m
+                minvalue = moved_dist
+        it[0] = minvalue
+        move[pos] = minmove
+        it.iternext()
     return dist, move
 
 # 降维编程
-editDistanceDP(["AAAA","BBB","CC"])
+print(editDistanceDP(["AAAA","BBB"]))
