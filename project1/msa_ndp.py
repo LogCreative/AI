@@ -43,17 +43,19 @@ def decodeMove(m:np.uint8,dim):
 
 def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
     L = len(S)
-    if L == 1:
-        dist = np.array([i*delta for i in range(len(S[0])+1)])
-        move = np.ones(shape=(len(S[0])+1), dtype=np.uint8)
-        move[0] = 0  # origin is 0
-        return dist, move
+    global fdim
     if len(dist)==0:
         # initialize dist and move
         shape = tuple(len(S[l])+1 for l in range(L))
         dist = np.ones(shape=shape, dtype=np.int32)
         dist = -1 * dist        # negative means no data
         move = np.zeros(shape=shape, dtype=np.uint8)
+        fdim = L
+    if L == 1:
+        dist = np.array([i*delta*(fdim - 1) for i in range(len(S[0])+1)])
+        move = np.ones(shape=(len(S[0])+1), dtype=np.uint8)
+        move[0] = 0  # origin is 0
+        return dist, move
     # calculate the lower dimension (edges)
     for s in range(L):
         slicer = tuple(0 if i==s else slice(None) for i in range(L)) # slice(None) stands for : symbol
@@ -75,7 +77,7 @@ def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
         for m in range(1,2**L):
             move_vec = decodeMove(m,L)
             prev_pos = tuple(a-b for a,b in zip(pos,move_vec))
-            penalty = comparelist([S[a][p] if move_vec[a]==1 else "-" for a,p in enumerate(prev_pos)])
+            penalty = comparelist([S[a][p] if move_vec[a]==1 else "-" for a,p in enumerate(prev_pos)]+["-" for i in range(fdim - L)])  # the term is required since the higher dim will be gapped.
             moved_dist = dist[prev_pos] + penalty
             if moved_dist < minvalue:
                 minmove = m
