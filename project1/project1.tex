@@ -51,7 +51,7 @@
     \begin{algorithm}[H]
         \caption{双序列比对动态规划 MSA}\label{alg:pairwise}
         \KwIn{$x_1x_2\cdots x_m, y_1y_2\cdots y_n,\alpha,\delta$}
-        \KwOut{最小损耗}
+        \KwOut{minimum cost}
         \BlankLine
         \lFor{$i\leftarrow 0$ to $m$}{$M[i,0]=i\delta$}
         \lFor{$j\leftarrow 0$ to $n$}{$M[0,j]=j\delta$}
@@ -82,7 +82,7 @@
         \begin{figure}[H]
             \centering
             \input{fig/pairwise_dp.tex}
-            \caption{双序列比对}\label{fig:pairwisedp}
+            \caption{动态规划双序列比对}\label{fig:pairwisedp}
         \end{figure}
     \end{minipage}
     \medskip
@@ -114,7 +114,7 @@
         \begin{figure}[H]
             \centering
             \input{fig/multiple_dp.tex}
-            \caption{三序列比对}\label{fig:multipledp}
+            \caption{动态规划三序列比对}\label{fig:multipledp}
         \end{figure}
     \end{minipage}
     \medskip
@@ -148,7 +148,7 @@
 
     如果字符串平均长度为 $l$，该算法 $L$ 维字符串的复杂度为：
     \begin{equation*}
-        O_S = \prod_{i=1}^L \texttt{len}(S[i]) \approx l^L
+        O_S = \prod_{i=1}^L \texttt{len}(S[i]) = O(l^L)
     \end{equation*}
 
     对于该问题，有 $m$ 个待比对序列，$n$ 个数据库项目，总时间复杂度为：
@@ -174,9 +174,86 @@
 
     \section{A* 算法}
 
-    使用启发函数 $g(n) = |\texttt{len}(S_1)-\texttt{len}(S_2)|$。
+    \subsection{算法描述}
 
-    
+    A* 算法会从后继结点中首先扩展评估函数 $f(n)=g(n)+h(n)$ 最小的结点，如果 $h(n)$ 的选择满足可满足启发式和一致性的性质，就可以找到按照贪婪算法的思想找到最优解。
+
+    这里将会非常乐观地估计剩下的字符串剩余部分都可以完美匹配，只会剩余间隔损耗。对于状态为 $n$ 的启发函数就可以被定义为轮换剩余长度差的和
+    \begin{equation*}
+        \delta\sum_{cyc} \left|(l_1-\texttt{pos}[i])-(l_2-\texttt{pos}[j])\right| \geq \delta \left(L\max a_i - \sum_i a_i\right) = h(n)
+    \end{equation*}
+    其中
+    \begin{equation*}
+        a_i = l_i - \texttt{pos}[i]
+    \end{equation*}
+
+    % 这种由乐观得到的启发函数使得对角线上的每一步都被估计为 0，易证为满足\textbf{可满足启发式}。
+
+    不等式容易从下面图 \ref{fig:gap} 的可视分析中论证，这样选择的 $h(n)$ 满足\textbf{可满足启发式}。
+
+    \begin{figure}[H]
+        \centering
+        \input{fig/gap_calc.tex}
+        \caption{每一个间隔都至少贡献了一次}\label{fig:gap}
+    \end{figure}
+
+    之后来证明\textbf{一致性}。对于 A* 算法而言，其下一步的定义如图 \ref{fig:pairwiseastar} 和 \ref{fig:multipleastar} 所示。此处每一步的损耗都会大于等于0，而这种最好情况只会在全部序列都减少了 1 长度才会产生（超体对角线），这种情况下$h(n)=h(n^\prime)$；由于坐标至少在某一维度上增加了 1，一旦产生了间隙，就会有至少 2 的损耗，但是启发函数只会对应地减少 1，所以这个函数将满足一致性：
+    \begin{equation*}
+        h(n)\leq c(n,a,n^\prime) + h(n^\prime)
+    \end{equation*}
+
+    \begin{figure}[H]
+        \centering
+        \input{fig/gap_tri.tex}
+        \caption{前进一步的不等式贡献}\label{fig:gaptri}
+    \end{figure}
+
+    \begin{figure}[h]
+        \centering
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \input{fig/pairwise_astar.tex}
+            \caption{A* 双序列比对}\label{fig:pairwiseastar}
+        \end{minipage}
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \input{fig/multiple_astar.tex}
+            \caption{A* 三序列比对}\label{fig:multipleastar}
+        \end{minipage}
+    \end{figure}
+
+    伪代码描述如算法 \ref{alg:astar} 所示，其中可选行动随着坐标的不同可能会被限制，这样就会首先扩展评估函数最小的结点。
+
+    \begin{algorithm}[h]
+        \caption{A* 多序列比对}\label{alg:astar}
+        \KwIn{$L$个字符串列表$S$,$\alpha$,$\delta$}
+        \KwOut{minimum cost}
+        \BlankLine
+        \texttt{pos}$\leftarrow$origin\;
+        $cost\leftarrow$0\;
+        \Repeat{\texttt{pos}$=$finish}{
+            $minmove\leftarrow$NULL\;
+            $mineval\leftarrow\infty$\;
+            \ForEach{avaliable move}{
+                $n\leftarrow$\texttt{pos}$+$\emph{avaliable move}\;
+                $f(n)=cost+\texttt{comparelist}(\textit{avaliable move})+h(n)$\;
+                \If{$f(n)<mineval$}{
+                    $minmove\leftarrow$\emph{avaliable move}\;
+                    $mineval\leftarrow f(n)$\;
+                }
+            }
+            \texttt{pos}$\leftarrow$\texttt{pos}$+$\emph{minmove}\;
+            $cost\leftarrow cost+\texttt{comparelist}(\textit{minmove})$\;
+        }
+        \Return{cost}\;
+    \end{algorithm}
+
+    \subsection{运行时间}
+
+    该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），最多进行 $\sum_i l_i$ 步，每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
+    \begin{equation*}
+        (2^L-1)\sum_i l_i = L(2^L-1)l = O(l)
+    \end{equation*}
 
     \bibliography{ref}
 

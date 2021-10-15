@@ -1,0 +1,12 @@
+\begin{tikzpicture}[font=\ttfamily,line width=1pt]
+\node[right] at (-2,1) {AAA\color{blue}OOO\color{red}OOOOO};
+\node[right] at (-2,0.5) {AAAAAA\color{red}OOOOO};
+\node[right] at (-2,0) {AAAAAAAAAAA};
+\draw[bend left,blue] (-1,1) node (v1) {} edge (-1,0.5);
+\draw[bend left,blue] (v1) edge (-1,0);
+\draw[bend left,red] (-0.5,1) edge (-0.5,0) node (v2) {};
+\draw[bend left,red] (-0.5,0.5) edge (-0.5,0);
+\node[right] at (1.5,1) {AAA\color{gray}OOOOOOOO};
+\node[right] at (1.5,0.5) {AAAAAA\color{gray}OOOOO};
+\node[right] at (1.5,0) {AAAAAAAAAAA};
+\end{tikzpicture}
