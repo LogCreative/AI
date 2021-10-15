@@ -39,4 +39,13 @@
             ]
         }
     ],
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./project1",
+        "-p",
+        "*test.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
 }
