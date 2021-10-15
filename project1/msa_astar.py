@@ -115,7 +115,6 @@ if __name__ == '__main__':
     with open(curdir + "MSA_database.txt") as df:
         targets = df.read().splitlines()
 
-    # Cross check
     with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
         with open(curdir + "astar_pq.txt","w") as of:
             for pq in pqs:
