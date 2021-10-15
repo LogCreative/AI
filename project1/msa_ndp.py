@@ -21,18 +21,6 @@ def comparelist(cs):
             res += compare(cs[i],cs[j])
     return res
 
-####### Data Preprocessing #######
-
-curdir = os.path.dirname(__file__) + "/"
-
-with open(curdir + "MSA_query.txt") as qf:
-    queries = qf.read()
-    pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
-    mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
-
-with open(curdir + "MSA_database.txt") as df:
-    targets = df.read().splitlines()
-
 ####### NDP #######
 
 # move will be encoded as binary, support up to 8 strings comparsion.
@@ -41,7 +29,7 @@ with open(curdir + "MSA_database.txt") as df:
 def decodeMove(m:np.uint8,dim):
     return tuple(1 if m & (2**v) > 0 else 0 for v in range(dim))
 
-def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
+def editDistanceNDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
     L = len(S)
     if L == 0:
         return np.array([0]), np.array([0])
@@ -56,7 +44,7 @@ def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
     # calculate the lower dimension (edges)
     for s in range(L):
         slicer = tuple(0 if i==s else slice(None) for i in range(L)) # slice(None) stands for : symbol
-        dist[slicer], move[slicer] = editDistanceDP(S[0:s]+S[s+1:L], dist[slicer], move[slicer]) # skip S[s]
+        dist[slicer], move[slicer] = editDistanceNDP(S[0:s]+S[s+1:L], dist[slicer], move[slicer]) # skip S[s]
         # configure move, insert 0 in the corresponding bit
         # Example: 4-dim xyzw xyw cube z(2) = 0, get an move 111(wyx), but with that be zero, it should be 1011.
         # REMEMBER to place the right end in the same level!
@@ -84,8 +72,8 @@ def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
         it.iternext()
     return dist, move
 
-def alignmentDP(S):
-    dist, move = editDistanceDP(S)
+def alignmentNDP(S):
+    dist, move = editDistanceNDP(S)
 
     path = []
     pos = tuple(len(s) for s in S)
@@ -105,47 +93,58 @@ def alignmentDP(S):
             else:
                 S_[axis] += S[axis][S_ptr[axis]]
                 S_ptr[axis] += 1
-    print(cost)
     return S_
 
-print(alignmentDP(["AAdasdasBAA","BBBdsadasC","BsadasBAAAAAA"]))
+if __name__ == '__main__':
 
-# Cross check
-with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-    with open(curdir + "ndp_pq.txt","w") as of:
-        for pq in pqs:
-            minindex = 0
-            mincost = np.inf
-            for d,tg in enumerate(targets):
-                pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
-                S = [pq,tg]
-                dist,move = editDistanceDP(S)
-                fin = tuple(len(s) for s in S)
-                pcost = dist[fin]
-                if pcost < mincost:
-                    minindex = d
-                    mincost = pcost
-                pbar.update(1)
-            of.write('\n'.join(alignmentDP([pq,targets[minindex]])))
-            of.write('\n'+str(mincost)+"\n\n")
-    pbar.set_description("Finish")
+    ####### Data Preprocessing #######
 
-# with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
-#     with open(curdir + "ndp_mq.txt","w") as of:
-#         for mq in mqs:
-#             minindex = (0,0)
-#             mincost = np.inf
-#             for i in range(len(targets)):
-#                 for j in range(i+1,len(targets)):
-#                     pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
-#                     S = [mq,targets[i],targets[j]]
-#                     dist,move = editDistanceDP(S)
-#                     fin = tuple(len(s) for s in S)
-#                     pcost = dist[fin]
-#                     if pcost < mincost:
-#                         minindex = (i,j)
-#                         mincost = pcost
-#                     pbar.update(1)
-#             of.write('\n'.join(alignmentDP([mq,targets[minindex[0]],targets[minindex[1]]])))
-#             of.write('\n'+str(mincost)+"\n\n")
-#     pbar.set_description("Finish")
+    curdir = os.path.dirname(__file__) + "/"
+
+    with open(curdir + "MSA_query.txt") as qf:
+        queries = qf.read()
+        pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
+        mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
+
+    with open(curdir + "MSA_database.txt") as df:
+        targets = df.read().splitlines()
+
+    # Cross check
+    with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
+        with open(curdir + "ndp_pq.txt","w") as of:
+            for pq in pqs:
+                minindex = 0
+                mincost = np.inf
+                for d,tg in enumerate(targets):
+                    pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
+                    S = [pq,tg]
+                    dist,move = editDistanceNDP(S)
+                    fin = tuple(len(s) for s in S)
+                    pcost = dist[fin]
+                    if pcost < mincost:
+                        minindex = d
+                        mincost = pcost
+                    pbar.update(1)
+                of.write('\n'.join(alignmentNDP([pq,targets[minindex]])))
+                of.write('\n'+str(mincost)+"\n\n")
+        pbar.set_description("Finish")
+
+    with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
+        with open(curdir + "ndp_mq.txt","w") as of:
+            for mq in mqs:
+                minindex = (0,0)
+                mincost = np.inf
+                for i in range(len(targets)):
+                    for j in range(i+1,len(targets)):
+                        pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
+                        S = [mq,targets[i],targets[j]]
+                        dist,move = editDistanceNDP(S)
+                        fin = tuple(len(s) for s in S)
+                        pcost = dist[fin]
+                        if pcost < mincost:
+                            minindex = (i,j)
+                            mincost = pcost
+                        pbar.update(1)
+                of.write('\n'.join(alignmentNDP([mq,targets[minindex[0]],targets[minindex[1]]])))
+                of.write('\n'+str(mincost)+"\n\n")
+        pbar.set_description("Finish")

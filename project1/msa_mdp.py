@@ -22,18 +22,6 @@ def comparelist(cs):
             res += compare(cs[i],cs[j])
     return res
 
-####### Data Preprocessing #######
-
-curdir = os.path.dirname(__file__) + "/"
-
-with open(curdir + "MSA_query.txt") as qf:
-    queries = qf.read()
-    pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
-    mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
-
-with open(curdir + "MSA_database.txt") as df:
-    targets = df.read().splitlines()
-
 ####### MDP #######
 
 def visit(_list, _indices):
@@ -42,7 +30,7 @@ def visit(_list, _indices):
         wrapper_ = wrapper_[_index]
     return wrapper_
 
-def editDistanceDP(S):
+def editDistanceMDP(S):
     # Initialize l edges.
     # Example: 3 strings
     #     |dist[0][0][k]|  dist[0][j][0] dist[i][0][0]
@@ -109,8 +97,8 @@ def editDistanceDP(S):
                 move_wrapper.extend(move_appender)
     return visit(dist,[len(s) for s in S]),move
 
-def alignmentDP(S:list):
-    cost,move = editDistanceDP(S)
+def alignmentMDP(S:list):
+    cost,move = editDistanceMDP(S)
 
     path = []
     pos = [len(s) for s in S]
@@ -129,69 +117,80 @@ def alignmentDP(S:list):
             else:
                 S_[axis] += S[axis][S_ptr[axis]]
                 S_ptr[axis] += 1
-    print(cost)
     return S_
 
-print(alignmentDP(["AAdasdasBAA","BBBdsadasC","BsadasBAAAAAA"]))
+if __name__ == '__main__':
 
-#### Cross check #####
-with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-    with open(curdir + "mdp_pq.txt","w") as of:
-        for pq in pqs:
-            minindex = 0
-            mincost = math.inf
-            for d,tg in enumerate(targets):
-                pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
-                pcost,mov = editDistanceDP([pq,tg])
-                if pcost < mincost:
-                    minindex = d
-                    mincost = pcost
-                pbar.update(1)
-            of.write('\n'.join(alignmentDP([pq,targets[minindex]])))
-            of.write('\n'+str(mincost)+"\n\n")
-    pbar.set_description("Finish")
+    ####### Data Preprocessing #######
 
-total=len(mqs)*len(targets)*(len(targets)-1)/2
-current = 0
+    curdir = os.path.dirname(__file__) + "/"
 
-minindex = ()
-mincost = math.inf
+    with open(curdir + "MSA_query.txt") as qf:
+        queries = qf.read()
+        pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
+        mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
 
-logf = open(curdir + "mdp.log","w")
-logf.write("Start" + '\n')
-logf.close()
+    with open(curdir + "MSA_database.txt") as df:
+        targets = df.read().splitlines()
 
-start = time.process_time()
+    #### 2d #####
+    with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
+        with open(curdir + "mdp_pq.txt","w") as of:
+            for pq in pqs:
+                minindex = 0
+                mincost = math.inf
+                for d,tg in enumerate(targets):
+                    pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
+                    pcost,mov = editDistanceMDP([pq,tg])
+                    if pcost < mincost:
+                        minindex = d
+                        mincost = pcost
+                    pbar.update(1)
+                of.write('\n'.join(alignmentMDP([pq,targets[minindex]])))
+                of.write('\n'+str(mincost)+"\n\n")
+        pbar.set_description("Finish")
 
-def log(msg):
-    global current
-    logf = open(curdir + "mdp.log","a")
-    logf.write('[' + str(current) + '/' + str(int(total)) + '] ' + str(datetime.timedelta(seconds=int(time.process_time() - start))) + ' ' + msg + '\n')
+    total=len(mqs)*len(targets)*(len(targets)-1)/2
+    current = 0
+
+    minindex = ()
+    mincost = math.inf
+
+    logf = open(curdir + "mdp.log","w")
+    logf.write("Start" + '\n')
     logf.close()
-  
-def processStrings(mid, tids):
-    global minindex,mincost,minalignment,current
-    log(str(mid) + ' & ' + str (tids) + ' START ')
-    pcost = editDistanceDP([mqs[mid]]+[targets[tid] for tid in tids])[0]
-    if pcost < mincost:
-        minindex = tids
-        mincost = pcost
-    current += 1
-    log(str(mid) + ' & ' + str (tids) + ' FINISH ' + str(pcost) + '/' + str(mincost))
 
-of = open(curdir + "mdp_mq.txt",'w')
-of.close()
+    start = time.process_time()
 
-with ThreadPoolExecutor(max_workers=8) as executer:
-    for mid in range(len(mqs)):
-        minindex = ()
-        mincost = math.inf
-        all_task = [executer.submit(processStrings, mid, [i,j]) 
-            for i in range(len(targets)) 
-            for j in range(i+1,len(targets))]
-        wait(all_task, return_when=ALL_COMPLETED)
-        of = open(curdir + "mdp_mq.txt","a")
-        of.write('\n'.join(alignmentDP([mqs[mid]]+[targets[tid] for tid in minindex])))
-        of.write('\n'+str(mincost)+"\n\n")
-        of.close()
-    log(' ALL FINISHED! ')
+    def log(msg):
+        global current
+        logf = open(curdir + "mdp.log","a")
+        logf.write('[' + str(current) + '/' + str(int(total)) + '] ' + str(datetime.timedelta(seconds=int(time.process_time() - start))) + ' ' + msg + '\n')
+        logf.close()
+    
+    def processStrings(mid, tids):
+        global minindex,mincost,minalignment,current
+        log(str(mid) + ' & ' + str (tids) + ' START ')
+        pcost = editDistanceMDP([mqs[mid]]+[targets[tid] for tid in tids])[0]
+        if pcost < mincost:
+            minindex = tids
+            mincost = pcost
+        current += 1
+        log(str(mid) + ' & ' + str (tids) + ' FINISH ' + str(pcost) + '/' + str(mincost))
+
+    of = open(curdir + "mdp_mq.txt",'w')
+    of.close()
+
+    with ThreadPoolExecutor(max_workers=8) as executer:
+        for mid in range(len(mqs)):
+            minindex = ()
+            mincost = math.inf
+            all_task = [executer.submit(processStrings, mid, [i,j]) 
+                for i in range(len(targets)) 
+                for j in range(i+1,len(targets))]
+            wait(all_task, return_when=ALL_COMPLETED)
+            of = open(curdir + "mdp_mq.txt","a")
+            of.write('\n'.join(alignmentMDP([mqs[mid]]+[targets[tid] for tid in minindex])))
+            of.write('\n'+str(mincost)+"\n\n")
+            of.close()
+        log(' ALL FINISHED! ')

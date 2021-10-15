@@ -22,18 +22,6 @@ def comparelist(cs):
             res += compare(cs[i],cs[j])
     return res
 
-####### Data Preprocessing #######
-
-curdir = os.path.dirname(__file__) + "/"
-
-with open(curdir + "MSA_query.txt") as qf:
-    queries = qf.read()
-    pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
-    mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
-
-with open(curdir + "MSA_database.txt") as df:
-    targets = df.read().splitlines()
-
 ####### NASTAR #######
 
 def decodeMove(m:np.uint8,L):
@@ -111,47 +99,59 @@ def alignmentASTAR(S):
             else:
                 S_[axis] += S[axis][S_ptr[axis]]
                 S_ptr[axis] += 1
-    return S_, cost
+    return S_
 
-print(alignmentASTAR(["AAdasdasBAA","BBBdsadasC","BsadasBAAAAAA"]))
+if __name__ == '__main__':
 
-# Cross check
-with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-    with open(curdir + "astar_pq.txt","w") as of:
-        for pq in pqs:
-            minindex = 0
-            mincost = math.inf
-            for d,tg in enumerate(targets):
-                pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
-                S = [pq,tg]
-                dist,move = editDistanceASTAR(S)
-                fin = tuple(len(s) for s in S)
-                pcost = dist[fin]
-                if pcost < mincost:
-                    minindex = d
-                    mincost = pcost
-                pbar.update(1)
-            minalign, _ = alignmentASTAR([pq,targets[minindex]])
-            of.write('\n'.join(minalign))
-            of.write('\n'+str(mincost)+"\n\n")
-    pbar.set_description("Finish")
+    ####### Data Preprocessing #######
 
-# with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
-#     with open(curdir + "ndp_mq.txt","w") as of:
-#         for mq in mqs:
-#             minindex = (0,0)
-#             mincost = np.inf
-#             for i in range(len(targets)):
-#                 for j in range(i+1,len(targets)):
-#                     pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
-#                     S = [mq,targets[i],targets[j]]
-#                     dist,move = editDistanceDP(S)
-#                     fin = tuple(len(s) for s in S)
-#                     pcost = dist[fin]
-#                     if pcost < mincost:
-#                         minindex = (i,j)
-#                         mincost = pcost
-#                     pbar.update(1)
-#             of.write('\n'.join(alignmentDP([mq,targets[minindex[0]],targets[minindex[1]]])))
-#             of.write('\n'+str(mincost)+"\n\n")
-#     pbar.set_description("Finish")
+    curdir = os.path.dirname(__file__) + "/"
+
+    with open(curdir + "MSA_query.txt") as qf:
+        queries = qf.read()
+        pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
+        mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
+
+    with open(curdir + "MSA_database.txt") as df:
+        targets = df.read().splitlines()
+
+    # Cross check
+    with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
+        with open(curdir + "astar_pq.txt","w") as of:
+            for pq in pqs:
+                minindex = 0
+                mincost = math.inf
+                for d,tg in enumerate(targets):
+                    pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
+                    S = [pq,tg]
+                    dist,move = editDistanceASTAR(S)
+                    fin = tuple(len(s) for s in S)
+                    pcost = dist[fin]
+                    if pcost < mincost:
+                        minindex = d
+                        mincost = pcost
+                    pbar.update(1)
+                minalign = alignmentASTAR([pq,targets[minindex]])
+                of.write('\n'.join(minalign))
+                of.write('\n'+str(mincost)+"\n\n")
+        pbar.set_description("Finish")
+
+    with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
+        with open(curdir + "ndp_mq.txt","w") as of:
+            for mq in mqs:
+                minindex = (0,0)
+                mincost = np.inf
+                for i in range(len(targets)):
+                    for j in range(i+1,len(targets)):
+                        pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
+                        S = [mq,targets[i],targets[j]]
+                        dist,move = editDistanceASTAR(S)
+                        fin = tuple(len(s) for s in S)
+                        pcost = dist[fin]
+                        if pcost < mincost:
+                            minindex = (i,j)
+                            mincost = pcost
+                        pbar.update(1)
+                of.write('\n'.join(alignmentASTAR([mq,targets[minindex[0]],targets[minindex[1]]])))
+                of.write('\n'+str(mincost)+"\n\n")
+        pbar.set_description("Finish")

@@ -11,18 +11,6 @@ def alpha(c1,c2):
 
 delta = 2           # gap
 
-####### Data Preprocessing #######
-
-curdir = os.path.dirname(__file__) + "/"
-
-with open(curdir + "MSA_query.txt") as qf:
-    queries = qf.read()
-    pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
-    mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
-
-with open(curdir + "MSA_database.txt") as df:
-    targets = df.read().splitlines()
-
 ####### DP #######
 
 # Move is defined as follows
@@ -94,18 +82,32 @@ def alignmentDP(_x:str, _y:str):
             y_ += "-"
     return x_ + '\n' + y_ + '\n'
 
-with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-    with open(curdir + "dp_pq.txt","w") as of:
-        for pq in pqs:
-            minindex = 0
-            mincost = math.inf
-            for d,tg in enumerate(targets):
-                pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
-                pcost,mov = editDistanceDP(pq,tg)
-                if pcost < mincost:
-                    minindex = d
-                    mincost = pcost
-                pbar.update(1)
-            of.write(alignmentDP(pq,targets[minindex]))
-            of.write(str(mincost)+"\n\n")
-    pbar.set_description("Finish")
+if __name__ == '__main__':
+
+    ####### Data Preprocessing #######
+
+    curdir = os.path.dirname(__file__) + "/"
+
+    with open(curdir + "MSA_query.txt") as qf:
+        queries = qf.read()
+        pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
+        mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
+
+    with open(curdir + "MSA_database.txt") as df:
+        targets = df.read().splitlines()
+
+    with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
+        with open(curdir + "dp_pq.txt","w") as of:
+            for pq in pqs:
+                minindex = 0
+                mincost = math.inf
+                for d,tg in enumerate(targets):
+                    pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
+                    pcost,mov = editDistanceDP(pq,tg)
+                    if pcost < mincost:
+                        minindex = d
+                        mincost = pcost
+                    pbar.update(1)
+                of.write(alignmentDP(pq,targets[minindex]))
+                of.write(str(mincost)+"\n\n")
+        pbar.set_description("Finish")
