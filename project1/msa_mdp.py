@@ -121,13 +121,14 @@ def alignmentDP(S:list):
         pos = [a-b for a,b in zip(pos,prev_move)]
 
     S_ = ["" for i in range(len(S))]
+    S_ptr = [0 for i in range(len(S))]
     for path_move in path:
         for axis,axis_move in enumerate(path_move):
             if axis_move==0:
                 S_[axis] += "-"
             else:
-                S_[axis] += S[axis][0]
-                S[axis] = S[axis][1:]
+                S_[axis] += S[axis][S_ptr[axis]]
+                S_ptr[axis] += 1
     return S_
 
 #### Cross check #####

@@ -222,38 +222,39 @@
         \end{minipage}
     \end{figure}
 
-    伪代码描述如算法 \ref{alg:astar} 所示，其中可选行动随着坐标的不同可能会被限制，这样就会首先扩展评估函数最小的结点。
+    伪代码描述如算法 \ref{alg:astar} 所示\cite{astarwiki}，其中可选行动随着坐标的不同可能会被限制，这样就会首先扩展评估函数最小的结点。
 
     \begin{algorithm}[h]
         \caption{A* 多序列比对}\label{alg:astar}
         \KwIn{$L$个字符串列表$S$,$\alpha$,$\delta$}
         \KwOut{minimum cost}
         \BlankLine
-        \texttt{pos}$\leftarrow$origin\;
-        $cost\leftarrow$0\;
-        \Repeat{\texttt{pos}$=$finish}{
-            $minmove\leftarrow$NULL\;
-            $mineval\leftarrow\infty$\;
-            \ForEach{avaliable move}{
-                $n\leftarrow$\texttt{pos}$+$\emph{avaliable move}\;
-                $f(n)=cost+\texttt{comparelist}(\textit{avaliable move})+h(n)$\;
-                \If{$f(n)<mineval$}{
-                    $minmove\leftarrow$\emph{avaliable move}\;
-                    $mineval\leftarrow f(n)$\;
-                }
-            }
-            \texttt{pos}$\leftarrow$\texttt{pos}$+$\emph{minmove}\;
-            $cost\leftarrow cost+\texttt{comparelist}(\textit{minmove})$\;
-        }
+        $openSet\leftarrow{origin}$\;
+        $dist$
+        % \Repeat{\texttt{pos}$=$finish}{
+        %     $minmove\leftarrow$NULL\;
+        %     $mineval\leftarrow\infty$\;
+        %     \ForEach{avaliable move}{
+        %         $n\leftarrow$\texttt{pos}$+$\emph{avaliable move}\;
+        %         $f(n)=cost+\texttt{comparelist}(\textit{avaliable move})+h(n)$\;
+        %         \If{$f(n)<mineval$}{
+        %             $minmove\leftarrow$\emph{avaliable move}\;
+        %             $mineval\leftarrow f(n)$\;
+        %         }
+        %     }
+        %     \texttt{pos}$\leftarrow$\texttt{pos}$+$\emph{minmove}\;
+        %     $cost\leftarrow cost+\texttt{comparelist}(\textit{minmove})$\;
+        % }
         \Return{cost}\;
     \end{algorithm}
 
+
     \subsection{运行时间}
 
-    该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），最多进行 $\sum_i l_i$ 步，每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
-    \begin{equation*}
-        (2^L-1)\sum_i l_i = L(2^L-1)l = O(l)
-    \end{equation*}
+    % 该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），最多进行 $\sum_i l_i$ 步，每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
+    % \begin{equation*}
+    %     (2^L-1)\sum_i l_i = L(2^L-1)l = O(l)
+    % \end{equation*}
 
     \bibliography{ref}
 

@@ -1,3 +1,5 @@
+# DEPRECATED THIS IS NOT ASTAR!
+
 import os, math
 from tqdm import tqdm       # pip install tqdm
 
@@ -34,7 +36,7 @@ with open(curdir + "MSA_database.txt") as df:
 
 ####### A* ########
 
-def alignmentDP(S):
+def alignmentAS(S):
     L = len(S)
     S = ["-"+S[i] for i in range(L)]
     pos = [0 for i in range(L)]
@@ -56,8 +58,9 @@ def alignmentDP(S):
             if True in tuple(n[i]>=len(S[i]) for i in range(L)):
                 continue
             a = [len(S[i])-n[i] for i in range(L)]
-            h = delta * (L*max(a)-sum(a))
-            # sum([abs(a[i]-a[j]) for i in range(L) for j in range(i+1,L)])
+            h = delta * sum([abs(a[i]-a[j]) for i in range(L) for j in range(i+1,L)])
+            # 
+            # (L*max(a)-sum(a))
             c = comparelist([S[s][char] if av_move[s]==1 else "-" for s,char in enumerate(n)])
             f = cost + c + h
             if f < mineval:
@@ -69,7 +72,7 @@ def alignmentDP(S):
         cost = cost + mincost
     return output, cost
 
-output, cost = alignmentDP(["AABAA","BBBC","BBAA"])
+output, cost = alignmentAS(["AABdasdadAA","BBBdsadsdC"])
 print('\n'.join(output))
 print(cost)
 
@@ -78,16 +81,16 @@ with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str
     with open(curdir + "astar_pq.txt","w") as of:
         for pq in pqs:
             minindex = 0
-            mincosting = math.inf
+            mincost = math.inf
             for d,tg in enumerate(targets):
                 pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
                 S = [pq,tg]
-                output,pcost = alignmentDP(S)
-                if pcost < mincosting:
+                output,pcost = alignmentAS(S)
+                if pcost < mincost:
                     minindex = d
-                    mincosting = pcost
+                    mincost = pcost
                 pbar.update(1)
-            minalign, _ = alignmentDP([pq,targets[minindex]])
+            minalign, _ = alignmentAS([pq,targets[minindex]])
             of.write('\n'.join(minalign))
-            of.write('\n'+str(mincosting)+"\n\n")
+            of.write('\n'+str(mincost)+"\n\n")
     pbar.set_description("Finish")
