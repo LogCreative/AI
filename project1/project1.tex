@@ -119,7 +119,7 @@
     \end{minipage}
     \medskip
 
-    可以统一化为多序列比对问题。对于 $L$ 条序列比对，其行动转换方法可以被表示为二进制从 $(\underbrace{0\cdots01}_{L\text{ digits}})_2$ 到 $(\underbrace{1\cdots11}_{L\text{ digits}})_2$ 内所有的数（最低位为第一维度），计算损耗使用上三角成对比较，规则统一为
+    可以统一化为多序列比对问题。对于 $L$ 条序列比对，首先需要递归地初始化低维度边缘（如图 \ref{fig:downdim} 所示，注意附加高维度的间隙），之后余下空间其行动转换方法可以被表示为二进制从 $(\underbrace{0\cdots01}_{L\text{ digits}})_2$ 到 $(\underbrace{1\cdots11}_{L\text{ digits}})_2$ 内所有的数（最低位为第一维度），计算损耗使用上三角成对比较，规则统一为
     \begin{equation*}
         \texttt{compare}=
         \begin{cases}
@@ -142,7 +142,7 @@
 
     几乎类似于双序列比对，下面是 \verb"numpy" 实现版本，虽然其速度没有使用 Python 内置的 \verb"list" 版本（\href{./msa\_mdp.py}{\ttfamily msa\_mdp.py}）的快，但是代码可读性已经与伪代码相当。
 
-    \codeseg[language=python]{msa\_ndp.py}{44}{86}
+    \codeseg[language=python]{msa\_ndp.py}{41}{85}
 
     \subsection{运行时间}
 

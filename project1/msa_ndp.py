@@ -43,6 +43,8 @@ def decodeMove(m:np.uint8,dim):
 
 def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
     L = len(S)
+    if L == 0:
+        return np.array([0]), np.array([0])
     global fdim
     if len(dist)==0:
         # initialize dist and move
@@ -51,11 +53,6 @@ def editDistanceDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
         dist = -1 * dist        # negative means no data
         move = np.zeros(shape=shape, dtype=np.uint8)
         fdim = L
-    if L == 1:
-        dist = np.array([i*delta*(fdim - 1) for i in range(len(S[0])+1)])
-        move = np.ones(shape=(len(S[0])+1), dtype=np.uint8)
-        move[0] = 0  # origin is 0
-        return dist, move
     # calculate the lower dimension (edges)
     for s in range(L):
         slicer = tuple(0 if i==s else slice(None) for i in range(L)) # slice(None) stands for : symbol
