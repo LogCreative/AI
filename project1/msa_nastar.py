@@ -113,7 +113,7 @@ def alignmentASTAR(S):
                 S_ptr[axis] += 1
     return S_, cost
 
-print(alignmentASTAR(["AABAA","BBBC","BBAAAAAA"]))
+print(alignmentASTAR(["AAdasdasBAA","BBBdsadasC","BsadasBAAAAAA"]))
 
 # Cross check
 with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:

@@ -106,9 +106,10 @@ def alignmentDP(S):
             else:
                 S_[axis] += S[axis][S_ptr[axis]]
                 S_ptr[axis] += 1
+    print(cost)
     return S_
 
-print(alignmentDP(["AABAA","BBBC","BBAAAAAA"]))
+print(alignmentDP(["AAdasdasBAA","BBBdsadasC","BsadasBAAAAAA"]))
 
 # Cross check
 with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:

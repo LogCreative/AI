@@ -53,7 +53,7 @@ def editDistanceDP(S):
     move = []
     for l in reversed(range(L)):
         for d in range(1 if l<L-1 else 0,len(S[l])+1):
-            dist_core = d * delta
+            dist_core = (L-1) * d * delta
             move_core = ()
             for i in range(L):
                 move_core = move_core + ((1 if i==l else 0),)
@@ -129,7 +129,10 @@ def alignmentDP(S:list):
             else:
                 S_[axis] += S[axis][S_ptr[axis]]
                 S_ptr[axis] += 1
+    print(cost)
     return S_
+
+print(alignmentDP(["AAdasdasBAA","BBBdsadasC","BsadasBAAAAAA"]))
 
 #### Cross check #####
 with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
