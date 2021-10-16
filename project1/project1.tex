@@ -142,7 +142,7 @@
 
     几乎类似于双序列比对，下面是 \verb"numpy" 实现版本，虽然其速度没有使用 Python 内置的 \verb"list" 版本（\href{./msa\_mdp.py}{\ttfamily msa\_mdp.py}）的快，但是代码可读性已经与伪代码相当。
 
-    \codeseg[language=python]{msa\_ndp.py}{41}{85}
+    \codeseg[language=python]{msa\_ndp.py}{29}{73}
 
     \subsection{运行时间}
 
@@ -178,7 +178,7 @@
 
     A* 算法会从后继结点中首先扩展评估函数 $f(n)=g(n)+h(n)$ 最小的结点，如果 $h(n)$ 的选择满足可满足启发式和一致性的性质，就可以找到按照贪婪算法的思想找到最优解。
 
-    这里将会非常乐观地估计剩下的字符串剩余部分都可以完美匹配，只会剩余间隔损耗。对于状态为 $n$ 的启发函数就可以被定义为轮换剩余长度差的和
+    这里将会非常乐观地估计剩下的字符串剩余部分都可以完美匹配，只会剩余间隔损耗。对于状态为 $n$ 的启发函数就可以被定义为轮换剩余长度差的和之下界
     \begin{equation*}
         \delta\sum_{cyc} \left|(l_1-\texttt{pos}[i])-(l_2-\texttt{pos}[j])\right| \geq \delta \left(L\max a_i - \sum_i a_i\right) = h(n)
     \end{equation*}
@@ -229,33 +229,56 @@
         \KwIn{$L$个字符串列表$S$,$\alpha$,$\delta$}
         \KwOut{minimum cost}
         \BlankLine
-        $openSet\leftarrow{origin}$\;
-        $dist$
-        % \Repeat{\texttt{pos}$=$finish}{
-        %     $minmove\leftarrow$NULL\;
-        %     $mineval\leftarrow\infty$\;
-        %     \ForEach{avaliable move}{
-        %         $n\leftarrow$\texttt{pos}$+$\emph{avaliable move}\;
-        %         $f(n)=cost+\texttt{comparelist}(\textit{avaliable move})+h(n)$\;
-        %         \If{$f(n)<mineval$}{
-        %             $minmove\leftarrow$\emph{avaliable move}\;
-        %             $mineval\leftarrow f(n)$\;
-        %         }
-        %     }
-        %     \texttt{pos}$\leftarrow$\texttt{pos}$+$\emph{minmove}\;
-        %     $cost\leftarrow cost+\texttt{comparelist}(\textit{minmove})$\;
-        % }
-        \Return{cost}\;
+        $dist[\cdot]\leftarrow\infty$\;
+        $move[\cdot]\leftarrow 0$\;
+        $dist[start]\leftarrow 0$\;
+        $move[start]\leftarrow 0$\;
+        $openSet\leftarrow\textsc{Min-Heap}()$\;
+        $openSet[start]=h(start)$\;
+        $closeSet\leftarrow \{\}$\;
+        \Repeat{$openSet$ is empty}{
+            $current\leftarrow openSet$.pop()\;
+            \If{$current$=$finish$}{
+                \Return{$dist[current]$}\;
+            }
+
+            $closeSet$.add($current$)\;
+            \ForEach{avaliable move of $current$}{
+                $n\leftarrow$\texttt{pos}$+$\emph{avaliable move}\;
+                $g(n)=cost+\texttt{comparelist}(\textit{avaliable move})$\;
+                \If{$g(n)<dist[n]$}{
+                    $move[n]\leftarrow$\emph{avaliable move}\;
+                    $dist[n]\leftarrow g(n)$\;
+                    \If{$n$ not in $closeSet$}{
+                        $openSet[n]\leftarrow g(n)+h(n)$\;
+                    }
+                }
+            }
+        }
+        \Return{$\infty$}\;
     \end{algorithm}
 
 
     \subsection{运行时间}
 
-    % 该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），最多进行 $\sum_i l_i$ 步，每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
-    % \begin{equation*}
-    %     (2^L-1)\sum_i l_i = L(2^L-1)l = O(l)
-    % \end{equation*}
+    该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），最多进行 $\sum_i l_i=Ll$ 步（如果平均长度为 $l$ 的话），每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
+    \begin{equation*}
+        (2^L-1)\sum_i l_i = L(2^L-1)l = O(l)
+    \end{equation*}
+    因为这是一个树状结构的图，所以一定能够找到路径。当然如果有多个最小节点的情况，这个复杂度会变差，但最多不会超过$O((2^L-1)^{Ll})$（实际上应当多项式时间内即可，这个是 A* 的最差复杂度）。
 
+    \begin{table}[H]
+        \centering
+        \caption{A* 运行时间}\label{tab:astar}
+        \begin{tabular}{ccc}
+            \toprule
+             & 双序列比对 & 三序列比对 \\
+            \midrule
+            运行时间 & 2min & $\sim$ \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
     \bibliography{ref}
 
 \end{document}

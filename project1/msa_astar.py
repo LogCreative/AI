@@ -136,7 +136,7 @@ if __name__ == '__main__':
         pbar.set_description("Finish")
 
     with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
-        with open(curdir + "ndp_mq.txt","w") as of:
+        with open(curdir + "astar_mq.txt","w") as of:
             for mq in mqs:
                 minindex = (0,0)
                 mincost = np.inf
