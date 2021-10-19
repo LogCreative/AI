@@ -4,6 +4,7 @@ from msa_dp import editDistanceDP
 from msa_mdp import editDistanceMDP
 from msa_ndp import editDistanceNDP
 from msa_astar import editDistanceASTAR
+from msa_ga import alignmentGA, costGA
 
 S2d = ["ILOTGJJLABWTSTGGONXJMUTUXSJHKWJHCTOQHWGAGIWLZHWPKZULJTZWAKBWHXMIKLZJGLXBPAHOHVOLZWOSJJLPO", "SVSTFKPPKPNMDKLAWSWGWUUPLWHOSHHBJJIHJKSCZPKKTHUGSTKBUIFJAKKSLIKXOLCLOKWUKTTKULMJLPBLMHUVTPPJPLIZLBHJPGPGXKPJJLKH"]
 ref2d = 0
@@ -32,6 +33,11 @@ class CrossTest(unittest.TestCase):
     def test_astar2d(self):
         astar2d = editDistanceASTAR(S2d)[0][(len(S2d[0]),len(S2d[1]))]
         self.assertEqual(ref2d,astar2d)
+
+    def test_ga2d(self):
+        ga2d = costGA(alignmentGA(S2d))
+        self.assertGreaterEqual(ga2d, ref2d)
+        self.assertLogs(str(ga2d)+"/"+str(ref2d))
     
     def test_ndp3d(self):
         ndp3d = editDistanceNDP(S3d)[0][(len(S3d[0]),len(S3d[1]),len(S3d[2]))]
@@ -41,6 +47,10 @@ class CrossTest(unittest.TestCase):
         astar3d = editDistanceASTAR(S3d)[0][(len(S3d[0]),len(S3d[1]),len(S3d[2]))]
         self.assertEqual(ref3d,astar3d)
 
+    def test_ga3d(self):
+        ga3d = costGA(alignmentGA(S3d))
+        self.assertGreaterEqual(ga3d, ref3d)
+        self.assertLogs(str(ga3d)+"/"+str(ref3d))
 
 if __name__ == '__main__':
     unittest.main()

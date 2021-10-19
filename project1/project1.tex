@@ -245,7 +245,7 @@
             $closeSet$.add($current$)\;
             \ForEach{avaliable move of $current$}{
                 $n\leftarrow$\texttt{pos}$+$\emph{avaliable move}\;
-                $g(n)=cost+\texttt{comparelist}(\textit{avaliable move})$\;
+                $g(n)=dist(n)+\texttt{comparelist}(\textit{avaliable move})$\;
                 \If{$g(n)<dist[n]$}{
                     $move[n]\leftarrow$\emph{avaliable move}\;
                     $dist[n]\leftarrow g(n)$\;
@@ -261,29 +261,54 @@
 
     \subsection{运行时间}
 
-    该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），最多进行 $\sum_i l_i=Ll$ 步（如果平均长度为 $l$ 的话），每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
+    该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
     \begin{equation*}
-        (2^L-1)\sum_i l_i = L(2^L-1)l = O(l)
+     < l^L \times (2^L-1) = O(l^L)
     \end{equation*}
-    因为这是一个树状结构的图，所以一定能够找到路径。当然如果有多个最小节点的情况，这个复杂度会变差，这个问题里不匹配都会有 3 的损耗，而不是 ASCII 距离，就会导致这种情况出现的可能性飙升，影响 A* 应当有的快速度。但最多不会超过$O((2^L-1)^{Ll})$（实际上应当多项式时间内即可，这个是 A* 的最差复杂度）。
+    因为这是一个树状结构的图，所以一定能够找到路径。扫描的节点数（第一项）要比动态规划小（如图 \ref{fig:path} 所示，由 \href{./compare.ipynb}{\ttfamily compare.ipynb} 生成），在常数级上会因为分支因子的多少而产生一定的差距。最多不会超过$\Theta((2^L-1)^{Ll})$（实际上应当多项式时间内即可，这个是 A* 的最差复杂度）。
 
-    \begin{table}[H]
-        \centering
-        \caption{A* 运行时间}\label{tab:astar}
-        \begin{tabular}{ccc}
-            \toprule
-             & 双序列比对 & 三序列比对 \\
-            \midrule
-            运行时间 & 2min & $\sim$ \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
+    \begin{minipage}{0.5\textwidth}
+        \begin{table}[H]
+            \centering
+            \caption{A* 运行时间}\label{tab:astar}
+            \begin{tabular}{ccc}
+                \toprule
+                 & 双序列比对 & 三序列比对 \\
+                \midrule
+                运行时间 & 2min & $\sim$ \\
+                \bottomrule
+            \end{tabular}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{path}
+            \caption{动态规划与A*扫描节点数上的比较}\label{fig:path}
+        \end{figure}
+    \end{minipage}
 
     \section{遗传算法}
 
     \subsection{算法描述}
     
-    参照简单遗传算法\cite{simplega}
+    % 简单遗传算法\cite{simplega} 在产生随机种群的时候使用了动态规划算法首先对每一对进行了预生成。
+
+    \paragraph{初始化种群} 在构造随机状态的时候，首先需要考虑构造出的比对序列长度。经验\cite{simplega}告诉我们：
+    \begin{equation*}
+         l = k\max{(l_1,l_2,\cdots,l_n)}
+    \end{equation*}
+    中的缩放因子$k$取$(1.2,1.5)$区间内较为合适。然后分别向字符串插入对应数量的空格以对齐。不需要考虑同一位置全为空隙的情况，因为这样这个位置的损耗为 0。
+
+    \paragraph{适应度函数} 将适应度函数定义为
+    \begin{equation*}
+        \mathit{fitness}(n) = l\alpha - cost(n)
+    \end{equation*}
+    表达与完全不匹配的距离。这个值越大，表明损耗越小，越有适应性。
+
+    \paragraph{杂交算子} 均一化适应度函数后，按照对应概率选择亲本进行繁殖。繁殖的后代每一个字符串将会随机地选择其中一个亲本的对应性状。
+
+    \paragraph{突变算子} 选中的子代随机选择一个字符串，移动其中一个间隙的位置。
 
     \bibliography{ref}
 
