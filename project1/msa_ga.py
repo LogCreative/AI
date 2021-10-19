@@ -92,7 +92,7 @@ def alignmentGA(S):
     population = initPopulation(S)
     pop_size = len(population)
     fitness_thres = alpha*L*(L-1)/2*len(population[0][0])*0.7
-    if L == 2: time_thres = 2
+    if L == 2: time_thres = 5
     else: time_thres = 90
     start = time.process_time()
     same_count = 0
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     
     #### 2d #####
     with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-        with open(curdir + "mdp_pq.txt","w") as of:
+        with open(curdir + "ga_pq.txt","w") as of:
             for pq in pqs:
                 minindex = 0
                 mincost = math.inf
@@ -144,5 +144,25 @@ if __name__ == '__main__':
                         mincost = pcost
                     pbar.update(1)
                 of.write('\n'.join(alignmentGA([pq,targets[minindex]])))
+                of.write('\n'+str(mincost)+"\n\n")
+        pbar.set_description("Finish")
+
+    ##### 3d ######
+    with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
+        with open(curdir + "ga_mq.txt","w") as of:
+            for mq in mqs:
+                minindex = (0,0)
+                mincost = math.inf
+                for i in range(len(targets)):
+                    for j in range(i+1,len(targets)):
+                        pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
+                        S = [mq,targets[i],targets[j]]
+                        align = alignmentGA(S)
+                        pcost = costGA(align)
+                        if pcost < mincost:
+                            minindex = (i,j)
+                            mincost = pcost
+                        pbar.update(1)
+                of.write('\n'.join(alignmentGA([mq,targets[minindex[0]],targets[minindex[1]]])))
                 of.write('\n'+str(mincost)+"\n\n")
         pbar.set_description("Finish")

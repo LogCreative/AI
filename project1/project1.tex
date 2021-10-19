@@ -302,13 +302,56 @@
 
     \paragraph{适应度函数} 将适应度函数定义为
     \begin{equation*}
-        \mathit{fitness}(n) = l\alpha - cost(n)
+        \mathit{fitness}(n) = l\alpha\frac{L(L-1)}{2} - cost(n)
     \end{equation*}
     表达与完全不匹配的距离。这个值越大，表明损耗越小，越有适应性。
 
     \paragraph{杂交算子} 均一化适应度函数后，按照对应概率选择亲本进行繁殖。繁殖的后代每一个字符串将会随机地选择其中一个亲本的对应性状。
 
     \paragraph{突变算子} 选中的子代随机选择一个字符串，移动其中一个间隙的位置。
+
+    具体描述如算法 \ref{alg:ga} 所示。种群数目被设定为 1000，突变率被设置为 1 \%。
+
+    \begin{algorithm}[H]
+        \caption{遗传算法多序列比对}\label{alg:ga}
+        \KwIn{$L$个字符串列表$S$,$\alpha$,$\delta$}
+        \KwOut{minimum cost}
+        \BlankLine
+        $\mathit{population}\leftarrow$\texttt{initPopulation}($S$)\;
+        \Repeat{max time is out}{
+            $\mathit{new\_population}\leftarrow\varnothing$\;
+            calculate $\mathit{pop\_fitness}$ for $\mathit{population}$\;
+            \lIf{$\max{\textit{pop\_fitness}}>$threshold}{\textbf{break}}
+            \For{$k\leftarrow 1$ to $\mathit{pop\_size}$}{
+                $p_1,p_2\leftarrow$ choices from $\mathit{population}$ based on the $\mathit{pop\_fitness}$\;
+                $\mathit{child}\leftarrow$\texttt{crossover}($p_1,p_2$)\;
+                \lIf{mutation is triggered}{$\mathit{child}\leftarrow$\texttt{mutation}($\mathit{child}$)}
+                $\mathit{new\_population}$.append($\mathit{child}$)\;
+            }
+            $\mathit{population}\leftarrow\mathit{new\_population}$\;
+        }
+        \Return{the best individual in $\mathit{population}$}\;
+    \end{algorithm}
+
+    \subsection{运行时间}
+
+    运行时间主要取决于设定的时间阈值。对于双序列比对被设定为 5s，对于多序列比对被设定为 90s，并不一定得到最优解，因为繁衍可能不够完善，有可能得到次优解。
+
+    \begin{table}[H]
+        \centering
+        \caption{遗传算法运行时间}\label{tab:ga}
+        \begin{tabular}{ccc}
+            \toprule
+             & 双序列比对 & 三序列比对 \\
+            \midrule
+            运行时间 & 45min & $\sim$ \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    \section{运行结果与结论}
+
+
 
     \bibliography{ref}
 
