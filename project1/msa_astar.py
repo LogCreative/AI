@@ -1,4 +1,3 @@
-import os, math
 import numpy as np
 from queue import PriorityQueue
 from msa_util import *

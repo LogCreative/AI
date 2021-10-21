@@ -1,6 +1,3 @@
-import enum
-import os, math
-from tqdm import tqdm       # pip install tqdm
 from msa_util import *
 
 ####### DP #######

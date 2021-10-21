@@ -9,7 +9,7 @@ from msa_ndp import editDistanceNDP
 from msa_astar import editDistanceASTAR
 from msa_ga import alignmentGA, costGA
 from msa_util import alignment,visit
-from project1.msa_dp import alignmentDP
+from msa_dp import alignmentDP
 
 def preprocessing():
     global curdir, pqs, mqs, targets

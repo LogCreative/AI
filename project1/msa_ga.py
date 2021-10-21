@@ -1,9 +1,6 @@
-import os
 import random
 import re
 import time
-import math
-from tqdm import tqdm
 from msa_util import *
 
 ####### GA #######

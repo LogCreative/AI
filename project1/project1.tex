@@ -142,7 +142,7 @@
 
     几乎类似于双序列比对，下面是 \verb"numpy" 实现版本，虽然其速度没有使用 Python 内置的 \verb"list" 版本（\href{./msa\_mdp.py}{\ttfamily msa\_mdp.py}）的快，但是代码可读性已经与伪代码相当。
 
-    \codeseg[language=python]{msa\_ndp.py}{11}{55}
+    \codeseg[language=python]{msa\_ndp.py}{9}{55}
 
     \subsection{运行时间}
 
@@ -292,7 +292,7 @@
 
     但是从图 \ref{fig:path} 我们可以看到这个版本的 A* 仅筛除了 30\% 左右的节点，导致其运行速度依然很慢。需要选择一个更好的启发函数 $h(n)$ 以解决这个问题。
 
-
+    启发函数可以使用轮换低维度反向损耗和以计算下界\cite{hastar}。
 
     \section{遗传算法}
 
@@ -355,9 +355,28 @@
         \end{tabular}
     \end{table}
 
-    \section{运行结果与结论}
+    \section{运行}
 
+    \subsection{运行框架}
 
+    为了更好地进行代码复用，本工程采用如表 \ref{tab:framework} 的框架。
+
+    \begin{table}[h]
+        \caption{运行框架}\label{tab:framework}
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \multicolumn{6}{|c|}{\filelink{crosstest.py}(测试) \filelink{main.py}(计算)} \\
+        \hline
+        \filelink{msa\_dp.py} & \filelink{msa\_mdp.py} & \filelink{msa\_ndp.py} & \filelink{msa\_astar.py} & \filelink{msa\_hstar.py} & \filelink{msa\_ga.py}\\
+        \hline
+        \multicolumn{6}{|c|}{\filelink{msa\_util.py}}\\
+        \hline        
+    \end{tabular}
+    \end{table}
+
+    运行测试是为了使用一个样例进行交叉测试，以避免大型计算后才发现一些算法错误。直接运行主文件，会被询问用什么算法完成，并选择计算几维的样例。
+
+    \subsection{运行结果}
 
     \bibliography{ref}
 

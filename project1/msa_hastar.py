@@ -1,6 +1,4 @@
-import os, math
 import numpy as np
-from tqdm import tqdm
 from queue import PriorityQueue
 from msa_util import *
 from msa_dp import editDistanceDP
