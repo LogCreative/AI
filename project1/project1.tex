@@ -142,7 +142,7 @@
 
     几乎类似于双序列比对，下面是 \verb"numpy" 实现版本，虽然其速度没有使用 Python 内置的 \verb"list" 版本（\href{./msa\_mdp.py}{\ttfamily msa\_mdp.py}）的快，但是代码可读性已经与伪代码相当。
 
-    \codeseg[language=python]{msa\_ndp.py}{29}{73}
+    \codeseg[language=python]{msa\_ndp.py}{11}{55}
 
     \subsection{运行时间}
 
@@ -243,11 +243,11 @@
             }
 
             $closeSet$.add($current$)\;
-            \ForEach{avaliable move of $current$}{
-                $n\leftarrow$\texttt{pos}$+$\emph{avaliable move}\;
-                $g(n)=dist(n)+\texttt{comparelist}(\textit{avaliable move})$\;
+            \ForEach{available move of $current$}{
+                $n\leftarrow$\texttt{pos}$+$\emph{available move}\;
+                $g(n)=dist(n)+\texttt{comparelist}(\textit{available move})$\;
                 \If{$g(n)<dist[n]$}{
-                    $move[n]\leftarrow$\emph{avaliable move}\;
+                    $move[n]\leftarrow$\emph{available move}\;
                     $dist[n]\leftarrow g(n)$\;
                     \If{$n$ not in $closeSet$}{
                         $openSet[n]\leftarrow g(n)+h(n)$\;
@@ -275,7 +275,7 @@
                 \toprule
                  & 双序列比对 & 三序列比对 \\
                 \midrule
-                运行时间 & 2min & $\sim$ \\
+                运行时间 & 2min & 100h \\
                 \bottomrule
             \end{tabular}
         \end{table}
@@ -287,6 +287,12 @@
             \caption{动态规划与A*扫描节点数上的比较}\label{fig:path}
         \end{figure}
     \end{minipage}
+
+    \subsection{改进}
+
+    但是从图 \ref{fig:path} 我们可以看到这个版本的 A* 仅筛除了 30\% 左右的节点，导致其运行速度依然很慢。需要选择一个更好的启发函数 $h(n)$ 以解决这个问题。
+
+
 
     \section{遗传算法}
 

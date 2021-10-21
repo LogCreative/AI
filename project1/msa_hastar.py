@@ -1,15 +1,13 @@
 import os, math
 import numpy as np
+from tqdm import tqdm
 from queue import PriorityQueue
 from msa_util import *
+from msa_dp import editDistanceDP
 
-####### NASTAR #######
+####### HASTAR #######
 
-def decodeMove(m:np.uint8,L):
-    # zyx
-    return tuple(1 if m & (2**v) > 0 else 0 for v in range(L))
-
-def editDistanceASTAR(S):
+def editDistanceHASTAR(S):
     L = len(S)
 
     # To shift the string starting from 1

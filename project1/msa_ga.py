@@ -4,26 +4,7 @@ import re
 import time
 import math
 from tqdm import tqdm
-
-##### Rule #####
-
-delta = 2
-alpha = 3
-
-def compare(c1,c2):
-    if c1==c2:
-        return 0    # match
-    if c1=='-' or c2=='-':
-        return delta
-    return alpha        # mismatch
-
-def comparelist(cs):
-    # cyclic compare
-    res = 0
-    for i in range(len(cs)):
-        for j in range(i+1,len(cs)):
-            res += compare(cs[i],cs[j])
-    return res
+from msa_util import *
 
 ####### GA #######
 
@@ -56,12 +37,12 @@ def fitness(individual):
     cost = 0
     for k in range(l):
         cost += comparelist([individual[i][k] for i in range(L)])
-    return alpha*L*(L-1)/2*l - cost  # all mismatch - current penalty
+    return misalpha*L*(L-1)/2*l - cost  # all mismatch - current penalty
 
 def costGA(individual):
     L = len(individual)
     l = len(individual[0])
-    return alpha*L*(L-1)/2*l - fitness(individual)
+    return misalpha*L*(L-1)/2*l - fitness(individual)
 
 def crossover(p1, p2):
     L = len(p1)
@@ -91,7 +72,7 @@ def alignmentGA(S):
     L = len(S)
     population = initPopulation(S)
     pop_size = len(population)
-    fitness_thres = alpha*L*(L-1)/2*len(population[0][0])*0.7
+    fitness_thres = misalpha*L*(L-1)/2*len(population[0][0])*0.7
     if L == 2: time_thres = 5
     else: time_thres = 90
     start = time.process_time()
@@ -113,56 +94,3 @@ def alignmentGA(S):
             new_population.append(child)
         population = new_population
     return population[pop_fitness.index(max(pop_fitness))]
-
-if __name__ == '__main__':
-
-    ####### Data Preprocessing #######
-
-    curdir = os.path.dirname(__file__) + "/"
-
-    with open(curdir + "MSA_query.txt") as qf:
-        queries = qf.read()
-        pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
-        mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
-
-    with open(curdir + "MSA_database.txt") as df:
-        targets = df.read().splitlines()
-
-    
-    #### 2d #####
-    with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-        with open(curdir + "ga_pq.txt","w") as of:
-            for pq in pqs:
-                minindex = 0
-                mincost = math.inf
-                for d,tg in enumerate(targets):
-                    pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
-                    align = alignmentGA([pq,tg])
-                    pcost = costGA(align)
-                    if pcost < mincost:
-                        minindex = d
-                        mincost = pcost
-                    pbar.update(1)
-                of.write('\n'.join(alignmentGA([pq,targets[minindex]])))
-                of.write('\n'+str(mincost)+"\n\n")
-        pbar.set_description("Finish")
-
-    ##### 3d ######
-    with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
-        with open(curdir + "ga_mq.txt","w") as of:
-            for mq in mqs:
-                minindex = (0,0)
-                mincost = math.inf
-                for i in range(len(targets)):
-                    for j in range(i+1,len(targets)):
-                        pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
-                        S = [mq,targets[i],targets[j]]
-                        align = alignmentGA(S)
-                        pcost = costGA(align)
-                        if pcost < mincost:
-                            minindex = (i,j)
-                            mincost = pcost
-                        pbar.update(1)
-                of.write('\n'.join(alignmentGA([mq,targets[minindex[0]],targets[minindex[1]]])))
-                of.write('\n'+str(mincost)+"\n\n")
-        pbar.set_description("Finish")

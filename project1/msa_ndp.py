@@ -1,33 +1,12 @@
 import os
 import numpy as np
 from tqdm import tqdm
-
-##### Rule #####
-
-delta = 2
-
-def compare(c1,c2):
-    if c1==c2:
-        return 0    # match
-    if c1=='-' or c2=='-':
-        return delta
-    return 3        # mismatch
-
-def comparelist(cs):
-    # cyclic compare
-    res = 0
-    for i in range(len(cs)):
-        for j in range(i+1,len(cs)):
-            res += compare(cs[i],cs[j])
-    return res
+from msa_util import *
 
 ####### NDP #######
 
 # move will be encoded as binary, support up to 8 strings comparsion.
 # REMEMBER: the dimension has len + 1 length!
-
-def decodeMove(m:np.uint8,dim):
-    return tuple(1 if m & (2**v) > 0 else 0 for v in range(dim))
 
 def editDistanceNDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
     L = len(S)
@@ -71,80 +50,3 @@ def editDistanceNDP(S,dist:np.array=np.array([]),move:np.array=np.array([])):
         move[pos] = minmove
         it.iternext()
     return dist, move
-
-def alignmentNDP(S):
-    dist, move = editDistanceNDP(S)
-
-    path = []
-    pos = tuple(len(s) for s in S)
-    cost = dist[pos]
-    start = tuple(0 for i in range(len(S)))
-    while not pos == start:
-        prev_move = decodeMove(move[pos],len(S))
-        path.insert(0,prev_move)
-        pos = tuple(a-b for a,b in zip(pos,prev_move))
-
-    S_ = ["" for i in range(len(S))]
-    S_ptr = [0 for i in range(len(S))]
-    for path_move in path:
-        for axis,axis_move in enumerate(path_move):
-            if axis_move==0:
-                S_[axis] += "-"
-            else:
-                S_[axis] += S[axis][S_ptr[axis]]
-                S_ptr[axis] += 1
-    return S_
-
-if __name__ == '__main__':
-
-    ####### Data Preprocessing #######
-
-    curdir = os.path.dirname(__file__) + "/"
-
-    with open(curdir + "MSA_query.txt") as qf:
-        queries = qf.read()
-        pqs = queries[queries.find('2\n')+len('2\n'):queries.find('3\n')].splitlines()
-        mqs = queries[queries.find('3\n')+len('3\n'):].splitlines()
-
-    with open(curdir + "MSA_database.txt") as df:
-        targets = df.read().splitlines()
-
-    # Cross check
-    with tqdm(total=len(pqs)*len(targets), desc="Starting Up", leave=True, unit='str') as pbar:
-        with open(curdir + "ndp_pq.txt","w") as of:
-            for pq in pqs:
-                minindex = 0
-                mincost = np.inf
-                for d,tg in enumerate(targets):
-                    pbar.set_description('Process: ' + pq[:10] + ' & ' + tg[:10])
-                    S = [pq,tg]
-                    dist,move = editDistanceNDP(S)
-                    fin = tuple(len(s) for s in S)
-                    pcost = dist[fin]
-                    if pcost < mincost:
-                        minindex = d
-                        mincost = pcost
-                    pbar.update(1)
-                of.write('\n'.join(alignmentNDP([pq,targets[minindex]])))
-                of.write('\n'+str(mincost)+"\n\n")
-        pbar.set_description("Finish")
-
-    with tqdm(total=len(mqs)*len(targets)*(len(targets)-1)/2, desc="Starting Up", leave=True, unit='str') as pbar:
-        with open(curdir + "ndp_mq.txt","w") as of:
-            for mq in mqs:
-                minindex = (0,0)
-                mincost = np.inf
-                for i in range(len(targets)):
-                    for j in range(i+1,len(targets)):
-                        pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
-                        S = [mq,targets[i],targets[j]]
-                        dist,move = editDistanceNDP(S)
-                        fin = tuple(len(s) for s in S)
-                        pcost = dist[fin]
-                        if pcost < mincost:
-                            minindex = (i,j)
-                            mincost = pcost
-                        pbar.update(1)
-                of.write('\n'.join(alignmentNDP([mq,targets[minindex[0]],targets[minindex[1]]])))
-                of.write('\n'+str(mincost)+"\n\n")
-        pbar.set_description("Finish")
