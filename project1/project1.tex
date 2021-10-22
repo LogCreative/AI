@@ -441,7 +441,7 @@
                 \toprule
                  & 双序列比对 & 三序列比对 \\
                 \midrule
-                运行时间 & 45min & $\sim$ \\
+                运行时间 & 45min & 46h \\
                 \bottomrule
             \end{tabular}
         \end{table}
@@ -526,7 +526,7 @@
     \begin{minipage}{0.3\textwidth}
         \begin{figure}[H]
             \centering
-            \includegraphics[height=7.5cm]{crosstest}
+            \includegraphics[height=8cm]{crosstest}
             \caption{交叉测试}
         \end{figure}
     \end{minipage}
@@ -535,6 +535,7 @@
             \centering
             \subfigure[动态规划运行 \texttt{mdp}]{\includegraphics[width=\linewidth]{dptime}}
             \subfigure[A* 运行 \texttt{hastar}]{\includegraphics[width=\linewidth]{astartime}}
+            \subfigure[遗传算法运行 \texttt{sga}]{\includegraphics[width=\linewidth]{gatime}}
             \caption{各算法运行}
         \end{figure}
     \end{minipage}
@@ -550,6 +551,39 @@
     \code{mdp3d.txt}
     \code{hastar3d.txt}
     % \code{sga3d.txt}
+        
+    \section{结论}
+
+    \begin{figure}[h]
+        \caption{运行结果总计}
+    \begin{tikzpicture}
+        \begin{axis}[ymin={0},
+        legend pos={north west},
+        xlabel={二维查询},
+        ylabel={损耗},
+        ybar,]
+         \pgfplotstableread [] {fig/result2d.dat}{\resulttwo};
+         \addplot+ [] table[x=set,y=mdp,] {\resulttwo};
+         \addplot+ [] table[x=set,y=astar,] {\resulttwo};
+         \addplot+ [] table[x=set,y=ga,] {\resulttwo};
+        \end{axis}
+    \end{tikzpicture}
+    \begin{tikzpicture}
+        \begin{axis}[width=5cm,height=7.3cm,enlarge x limits=0.8,ymin={0},
+        legend pos={outer north east},
+        xlabel={三维查询},
+        ylabel={损耗},
+        ybar,]
+         \pgfplotstableread [] {fig/result3d.dat}{\resultthree};
+         \addplot+ [] table[x=set,y=mdp,] {\resultthree};
+         \addplot+ [] table[x=set,y=hastar,] {\resultthree};
+         \addplot+ [] table[x=set,y=sga,] {\resultthree};
+         \legend{DP,A*,GA,}
+        \end{axis}
+    \end{tikzpicture}
+    \end{figure}
+
+
 
     \bibliography{ref}
 
