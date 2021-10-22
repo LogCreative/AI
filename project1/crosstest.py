@@ -6,6 +6,7 @@ from msa_ndp import editDistanceNDP
 from msa_astar import editDistanceASTAR
 from msa_hastar import editDistanceHASTAR
 from msa_ga import alignmentGA, costGA
+from msa_sga import alignmentSGA, costSGA
 from msa_util import alignment
 from msa_dp import alignmentDP
 
@@ -53,6 +54,11 @@ class CrossTest(unittest.TestCase):
         self.assertGreaterEqual(ga2d, ref2d)
         self.assertLogs(str(ga2d)+"/"+str(ref2d))
 
+    def test_sga2d(self):
+        sga2d = costSGA(alignmentSGA(S2d))
+        self.assertGreaterEqual(sga2d, ref2d)
+        self.assertLogs(str(sga2d)+"/"+str(ref2d))
+
     def test_mdp3d(self):
         alignment(S3d,editDistanceMDP)
     
@@ -75,6 +81,11 @@ class CrossTest(unittest.TestCase):
         ga3d = costGA(alignmentGA(S3d))
         self.assertGreaterEqual(ga3d, ref3d)
         self.assertLogs(str(ga3d)+"/"+str(ref3d))
+
+    def test_sga3d(self):
+        sga3d = costSGA(alignmentSGA(S3d))
+        self.assertGreaterEqual(sga3d, ref3d)
+        self.assertLogs(str(sga3d)+"/"+str(ref3d))
 
 if __name__ == '__main__':
     unittest.main()

@@ -79,7 +79,7 @@ def process3d(func, methodname):
                             mincost = pcost
                         pbar.update(1)
                 if methodname == "ga" or methodname == "sga":
-                    minalign = alignmentGA([mq,targets[minindex[0]],targets[minindex[1]]])
+                    minalign = func([mq,targets[minindex[0]],targets[minindex[1]]])
                 else:
                     minalign = alignment([mq,targets[minindex[0]],targets[minindex[1]]],func)
                 of.write('\n'.join(minalign))

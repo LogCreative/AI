@@ -9,7 +9,12 @@
     % 3）不同算法的运行时间；
     % 4）复杂度分析。
 
+    \begin{abstract}
+        本项目实现了对于多序列比对（MSA）的三种算法：动态规划、A*和遗传算法，所有函数（除了二维专用加速的\filelink{msa\_dp.py}）都被实现为可以输入任意条字符串的函数（最好不超过8条）。动态规划算法为递归降维实现；A*算法在改进上采用了低维度轮换预期损耗和作为启发函数；遗传算法在改进上采用了基于\emph{内卷}的局部适应度函数。使用了模块化代码架构，并提供交叉测试文件\filelink{crosstest.py}，与构建主程序\filelink{main.py}。
+    \end{abstract}
+
     \tableofcontents
+
     \clearpage
 
     \section{题目}
@@ -261,7 +266,7 @@
 
     \subsection{运行时间}
 
-    该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
+    基本 A* 算法实现于 \filelink{msa\_astar.py}。该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
     \begin{equation}
      < l^L \times (2^L-1) = O(l^L)
     \end{equation}
@@ -425,7 +430,7 @@
 
     \subsection{运行时间}
 
-    运行时间主要取决于设定的时间阈值。对于双序列比对被设定为 5s，对于多序列比对被设定为 90s，并不一定得到最优解，因为繁衍可能不够完善，有可能得到次优解。
+    基本遗传算法实现于\filelink{msa\_ga.py}。运行时间主要取决于设定的时间阈值。对于双序列比对被设定为 5s，对于多序列比对被设定为 20s，并不一定得到最优解，因为繁衍可能不够完善，有可能得到次优解。
 
     \noindent
     \begin{minipage}{0.6\textwidth}
@@ -452,7 +457,7 @@
 
     \subsection{改进}
 
-    如图 \ref{fig:ga} 所示，现有的基本遗传算法收敛速度是相当慢的。为了让遗传算法的收敛速度更快，需要对初始化种群的方法进行改进。
+    如图 \ref{fig:ga} 所示，现有的基本遗传算法收敛速度是相当慢的。为了让遗传算法的收敛速度更快，需要对初始化种群的方法进行改进。注意改进主要针对三维情况，该部分代码见 \filelink{msa\_sga.py}。
 
     采用二维动态规划出的匹配序列进行初始化种群\cite{simplega}，现在的字符串长度
     \begin{equation}
@@ -501,20 +506,50 @@
 
     \begin{table}[h]
         \caption{运行框架}\label{tab:framework}
-    \begin{tabular}{|c|c|c|c|c|c|}
+        \small
+    \begin{tabular}{|c|c|c|c|c|c|c|}
         \hline
-        \multicolumn{6}{|c|}{\filelink{crosstest.py}(测试) \filelink{main.py}(计算)} \\
+        \multicolumn{7}{|c|}{\filelink{crosstest.py}(测试) \filelink{main.py}(计算)} \\
         \hline
-        \filelink{msa\_dp.py} & \filelink{msa\_mdp.py} & \filelink{msa\_ndp.py} & \filelink{msa\_astar.py} & \filelink{msa\_hastar.py} & \filelink{msa\_ga.py}\\
+        \filelink{msa\_dp.py} & \filelink{msa\_mdp.py} & \filelink{msa\_ndp.py} & \filelink{msa\_astar.py} & \filelink{msa\_hastar.py} & \filelink{msa\_ga.py} & \filelink{msa\_sga.py}\\
         \hline
-        \multicolumn{6}{|c|}{\filelink{msa\_util.py}}\\
+        \multicolumn{7}{|c|}{\filelink{msa\_util.py}}\\
         \hline        
     \end{tabular}
     \end{table}
 
     运行测试是为了使用一个样例进行交叉测试，以避免大型计算后才发现一些算法错误。直接运行主文件，会被询问用什么算法完成，并选择计算几维的样例。
 
+    \subsection{运行情况}
+
+    \noindent
+    \begin{minipage}{0.3\textwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[height=7.5cm]{crosstest}
+            \caption{交叉测试}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}{0.7\textwidth}
+        \begin{figure}[H]
+            \centering
+            \subfigure[动态规划运行 \texttt{mdp}]{\includegraphics[width=\linewidth]{dptime}}
+            \subfigure[A* 运行 \texttt{hastar}]{\includegraphics[width=\linewidth]{astartime}}
+            \caption{各算法运行}
+        \end{figure}
+    \end{minipage}
+
     \subsection{运行结果}
+
+    \lstset{framexleftmargin=0mm,
+    xleftmargin=0mm,breaklines=false,
+    basicstyle=\ttfamily\scriptsize}
+    \code{mdp2d.txt}
+    \code{astar2d.txt}
+    \code{ga2d.txt}
+    \code{mdp3d.txt}
+    \code{hastar3d.txt}
+    % \code{sga3d.txt}
 
     \bibliography{ref}
 

@@ -5,7 +5,7 @@ import time
 from msa_util import *
 from msa_dp import alignmentDP
 
-####### GA #######
+####### SGA #######
 
 def initPopulationDP(S):
     L = len(S)
@@ -62,13 +62,22 @@ def mutation(individual):
     individual[mutator] = ''.join(mutator_list)
     return individual
 
+def filterGap(pop):
+    i = 0
+    while i < len(pop[0]):
+        if [k[i] for k in pop] == ["-" for k in pop]:
+            pop = [k[:i]+k[i+1:] for k in pop]    # filter the excess gap
+        else:
+            i += 1
+    return pop
+
 def alignmentSGA(S):
     L = len(S)
     population = initPopulationDP(S)
     pop_size = len(population)
-    fitness_thres = misalpha*L*(L-1)/2*len(population[0][0])*0.3
+    fitness_thres = misalpha*L*(L-1)/2*len(population[0][0])*0.35
     if L == 2: time_thres = 5
-    else: time_thres = 45
+    else: time_thres = 20
     start = time.process_time()
     while (time.process_time()-start)<time_thres:      # set timer
         new_population = []
@@ -84,4 +93,5 @@ def alignmentSGA(S):
             if (random.randint(0,10)==0): child = mutation(child) # 10% mutation
             new_population.append(child)
         population = new_population
-    return population[pop_fitness.index(max(pop_fitness))]
+    best_pop = population[pop_fitness.index(max(pop_fitness))]
+    return filterGap(best_pop)
