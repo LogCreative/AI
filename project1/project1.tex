@@ -398,7 +398,7 @@
 
     \paragraph{杂交算子} 均一化适应度函数后，按照对应概率选择亲本进行繁殖。繁殖的后代每一个字符串将会随机地选择其中一个亲本的对应性状。
 
-    \paragraph{突变算子} 选中的子代随机选择一个字符串，移动其中一个间隙的位置。
+    \paragraph{突变算子} 突变算子只能改变间隙，不能够修改字符（否则字符串比对就会不完整）。选中的子代随机选择一个字符串，移动其中一个间隙的位置。
 
     具体描述如算法 \ref{alg:ga} 所示。种群数目被设定为 1000，突变率被设置为 1 \%。
 
@@ -477,7 +477,21 @@
     \end{minipage}
     \vspace*{5pt}
 
-    这种方法可以进行预对齐，图 \ref{fig:ga2} 可见其起点变得更低了。但是其减少速度却没有明显变化。这个时候就要引入更多的交叉互换策略。
+    这种方法可以进行预对齐，图 \ref{fig:ga2} 可见其起点变得更低了。但是其减少速度却没有明显变化。这个时候需要修改适应度函数，基于\emph{内卷}的方法，将损耗最大的设置为最差的，并被\textbf{筛除}，当前轮其余个体在损耗上与之的差值作为适应度函数。这样就是 1:1 对应的局部竞争，选择优秀个体繁衍后代，每一轮的标准都会有所不同。并且提高突变概率为 10\%，以提高多样性。图 \ref{fig:ga3} 显示了这种方法的更快的收敛速度。
+
+    \noindent
+    \begin{minipage}{0.6\textwidth}
+        \begin{equation*}
+            \mathit{fitness}(i) = \max_i(\texttt{cost}_i)-\texttt{cost}_i
+        \end{equation*}
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{ga3}
+            \caption{改进适应度函数后}\label{fig:ga3}
+        \end{figure}
+    \end{minipage}
 
     \section{运行}
 

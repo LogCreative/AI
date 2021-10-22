@@ -11,6 +11,7 @@ from msa_hastar import editDistanceHASTAR
 from msa_ga import alignmentGA, costGA
 from msa_util import alignment,visit
 from msa_dp import alignmentDP
+from msa_sga import alignmentSGA, costSGA
 
 def preprocessing():
     global curdir, pqs, mqs, targets
@@ -35,6 +36,8 @@ def process2d(func, methodname):
                     S = [pq,tg]
                     if methodname == "ga":
                         pcost = costGA(func(S))
+                    elif methodname == "sga":
+                        pcost = costSGA(func(S))
                     else:
                         dist,move = func(S[0],S[1]) if methodname=="dp" else func(S)
                         fin = tuple(len(s) for s in S)
@@ -43,8 +46,8 @@ def process2d(func, methodname):
                         minindex = d
                         mincost = pcost
                     pbar.update(1)
-                if methodname == "ga":
-                    minalign = alignmentGA([pq,targets[minindex]])
+                if methodname == "ga" or methodname == "sga":
+                    minalign = func([pq,targets[minindex]])
                 elif methodname == "dp":
                     minalign = alignmentDP(pq,targets[minindex])
                 else:
@@ -65,6 +68,8 @@ def process3d(func, methodname):
                         S = [mq,targets[i],targets[j]]
                         if methodname == "ga":
                             pcost = costGA(func(S))
+                        elif methodname == "sga":
+                            pcost = costSGA(func(S))
                         else:
                             dist,move = func(S)
                             fin = tuple(len(s) for s in S)
@@ -73,7 +78,7 @@ def process3d(func, methodname):
                             minindex = (i,j)
                             mincost = pcost
                         pbar.update(1)
-                if methodname == "ga":
+                if methodname == "ga" or methodname == "sga":
                     minalign = alignmentGA([mq,targets[minindex[0]],targets[minindex[1]]])
                 else:
                     minalign = alignment([mq,targets[minindex[0]],targets[minindex[1]]],func)
@@ -83,7 +88,7 @@ def process3d(func, methodname):
 
 if __name__ == '__main__':
 
-    choosemethod = input("Input the method (dp, mdp, ndp, astar, hastar, ga):")
+    choosemethod = input("Input the method (dp, mdp, ndp, astar, hastar, ga, sga):")
     choosedim = input("Input the dimension for analysis (2, 3):")
 
     preprocessing()
@@ -102,6 +107,8 @@ if __name__ == '__main__':
         methodfunc = editDistanceHASTAR
     elif choosemethod == "ga":
         methodfunc = alignmentGA
+    elif choosemethod == "sga":
+        methodfunc = alignmentSGA
 
     if choosedim == "2":
         process2d(methodfunc, choosemethod)

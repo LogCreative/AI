@@ -1,5 +1,6 @@
 import random
 import re
+from threading import Thread
 import time
 from msa_util import *
 from msa_dp import alignmentDP
@@ -29,22 +30,16 @@ def initPopulationDP(S):
         population[i] = [population[i][k]+"-"*(maxl-len(population[i][k])) for k in range(L)]       # fill up
     return population
 
-def fitness(individual):
+def costSGA(individual):
     L = len(individual)
     l = len(individual[0])
     cost = 0
     for k in range(l):
         cost += comparelist([individual[i][k] for i in range(L)])
-    return misalpha*L*(L-1)/2*l - cost  # all mismatch - current penalty
-
-def costGA(individual):
-    L = len(individual)
-    l = len(individual[0])
-    return misalpha*L*(L-1)/2*l - fitness(individual)
+    return cost  # all mismatch - current penalty
 
 def crossover(p1, p2):
     L = len(p1)
-    # horizontal crossover
     child = []
     for i in range(L):
         selector = random.randint(1,2)
@@ -52,8 +47,6 @@ def crossover(p1, p2):
             child.append(p1[i])
         else:
             child.append(p2[i])
-    # vertical crossover
-    
     return child
 
 def mutation(individual):
@@ -73,25 +66,22 @@ def alignmentSGA(S):
     L = len(S)
     population = initPopulationDP(S)
     pop_size = len(population)
-    fitness_thres = misalpha*L*(L-1)/2*len(population[0][0])*0.7
+    fitness_thres = misalpha*L*(L-1)/2*len(population[0][0])*0.3
     if L == 2: time_thres = 5
-    else: time_thres = 90
+    else: time_thres = 45
     start = time.process_time()
-    same_count = 0
-    prev_best = 0
     while (time.process_time()-start)<time_thres:      # set timer
         new_population = []
-        pop_fitness = [fitness(individual) for individual in population]
-        cur_best = max(pop_fitness)
-        if cur_best>fitness_thres: break    # fitness enough
-        if cur_best==prev_best: same_count += 1
-        else: same_count = 0
-        if same_count > 15: break   # duplicated eval, stop
-        prev_best = cur_best
+        # dynamic fitness
+        pop_fitness = [costSGA(individual) for individual in population]
+        bottom_line = max(pop_fitness)      # the biggest one will get filtered
+        cur_best = min(pop_fitness)
+        pop_fitness = [bottom_line - c for c in pop_fitness]
+        if cur_best<fitness_thres: break    # fitness enough
         for k in range(pop_size):
             p1,p2 = random.choices(population=population,weights=pop_fitness,k=2)
             child = crossover(p1,p2)
-            if (random.randint(0,100)==0): child = mutation(child) # 1% mutation
+            if (random.randint(0,10)==0): child = mutation(child) # 10% mutation
             new_population.append(child)
         population = new_population
     return population[pop_fitness.index(max(pop_fitness))]
