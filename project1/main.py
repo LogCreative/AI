@@ -7,6 +7,7 @@ from msa_dp import editDistanceDP
 from msa_mdp import editDistanceMDP
 from msa_ndp import editDistanceNDP
 from msa_astar import editDistanceASTAR
+from msa_hastar import editDistanceHASTAR
 from msa_ga import alignmentGA, costGA
 from msa_util import alignment,visit
 from msa_dp import alignmentDP
@@ -82,7 +83,7 @@ def process3d(func, methodname):
 
 if __name__ == '__main__':
 
-    choosemethod = input("Input the method (dp, mdp, ndp, astar, ga):")
+    choosemethod = input("Input the method (dp, mdp, ndp, astar, hastar, ga):")
     choosedim = input("Input the dimension for analysis (2, 3):")
 
     preprocessing()
@@ -98,7 +99,7 @@ if __name__ == '__main__':
     elif choosemethod == "astar":
         methodfunc = editDistanceASTAR
     elif choosemethod == "hastar":
-        methodfunc = editDistanceASTAR
+        methodfunc = editDistanceHASTAR
     elif choosemethod == "ga":
         methodfunc = alignmentGA
 

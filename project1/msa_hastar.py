@@ -11,12 +11,27 @@ def editDistanceHASTAR(S):
     # To shift the string starting from 1
     S = ["-"+S[i] for i in range(L)]
 
+    SR = [S[i][::-1] for i in range(L)]
+    pdists = []
+    for i in range(L):
+        for j in range(i+1, L):
+            pdist, pmove = editDistanceDP(SR[i],SR[j])
+            pdist.reverse()     # row reverse
+            for k in range(len(pdist)):
+                pdist[k].reverse()  # column reverse
+            pdists.append(pdist)
+
     def h(pos:tuple):
         """
         heuristic function
         """
-        a = [len(S[i])-pos[i] for i in range(L)]
-        return delta * (L*max(a)-sum(a))
+        hp = 0
+        k = 0
+        for i in range(L):
+            for j in range(i+1, L):
+                hp += pdists[k][pos[i]][pos[j]]
+                k += 1
+        return hp
 
     # initialize dist and move and openSet
     shape = tuple(len(S[l]) for l in range(L))
