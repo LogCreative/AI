@@ -427,21 +427,57 @@
 
     运行时间主要取决于设定的时间阈值。对于双序列比对被设定为 5s，对于多序列比对被设定为 90s，并不一定得到最优解，因为繁衍可能不够完善，有可能得到次优解。
 
-    \begin{table}[H]
-        \centering
-        \caption{遗传算法运行时间}\label{tab:ga}
-        \begin{tabular}{ccc}
-            \toprule
-             & 双序列比对 & 三序列比对 \\
-            \midrule
-            运行时间 & 45min & $\sim$ \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
+    \noindent
+    \begin{minipage}{0.6\textwidth}
+        \begin{table}[H]
+            \centering
+            \caption{遗传算法运行时间}\label{tab:ga}
+            \begin{tabular}{ccc}
+                \toprule
+                 & 双序列比对 & 三序列比对 \\
+                \midrule
+                运行时间 & 45min & $\sim$ \\
+                \bottomrule
+            \end{tabular}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{ga}
+            \caption{遗传算法收敛情况}\label{fig:ga}
+        \end{figure}
+    \end{minipage}
+    \vspace*{5pt}
 
     \subsection{改进}
 
-    为了让遗传算法的收敛速度更快，需要对初始化种群的方法进行改进。
+    如图 \ref{fig:ga} 所示，现有的基本遗传算法收敛速度是相当慢的。为了让遗传算法的收敛速度更快，需要对初始化种群的方法进行改进。
+
+    采用二维动态规划出的匹配序列进行初始化种群\cite{simplega}，现在的字符串长度
+    \begin{equation}
+        l = k\max{(l_1,l_2,\cdots,l_n)}+x
+    \end{equation}
+    式子中 $x$ 为初始偏移最大值，取 $1.2\max_i{l_i}$，算法 \ref{alg:dpinit} 给出了初始化方法。
+
+    \noindent
+    \begin{minipage}{0.6\textwidth}
+        \begin{algorithm}[H]
+            \caption{基于动态规划的种群初始化}\label{alg:dpinit}
+            对每一对字符串根据算法 \ref{alg:pairwise} 计算出最佳比对\;
+            对于每一种群，每一个个体选择其中对应的一种匹配串，增加随机数量（不超过 $x$）的前缀间隔，后缀补齐间隔为预定字符串最大长度 $l$\;
+        \end{algorithm}
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{ga2}
+            \caption{改进初始化种群后}\label{fig:ga2}
+        \end{figure}
+    \end{minipage}
+    \vspace*{5pt}
+
+    这种方法可以进行预对齐，图 \ref{fig:ga2} 可见其起点变得更低了。但是其减少速度却没有明显变化。这个时候就要引入更多的交叉互换策略。
 
     \section{运行}
 

@@ -69,3 +69,4 @@ def editDistanceHASTAR(S):
                     openSet.put((g + h(neighbor),neighbor))
 
     raise Exception("unreachable.")
+    
