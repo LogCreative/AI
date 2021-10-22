@@ -87,7 +87,7 @@
     \end{minipage}
     \medskip
     
-    \subsection{多序列比对}
+    \subsection{多序列比对}\label{sec:mdp}
 
     对于三序列比对，情况就复杂地多，需要同时考虑七条路径。
 
@@ -119,7 +119,7 @@
     \end{minipage}
     \medskip
 
-    可以统一化为多序列比对问题。对于 $L$ 条序列比对，首先需要递归地初始化低维度边缘（如图 \ref{fig:downdim} 所示，注意附加高维度的间隙），之后余下空间其行动转换方法可以被表示为二进制从 $(\underbrace{0\cdots01}_{L\text{ digits}})_2$ 到 $(\underbrace{1\cdots11}_{L\text{ digits}})_2$ 内所有的数（最低位为第一维度），计算损耗使用上三角成对比较，规则统一为
+    可以统一化为多序列比对问题。对于 $L$ 条序列比对，首先需要递归地初始化低维度边缘（如图 \ref{fig:downdim} 所示，注意附加高维度的间隙，高维度以间隙填充表示），之后余下空间其行动转换方法可以被表示为二进制从 $(\underbrace{0\cdots01}_{L\text{ digits}})_2$ 到 $(\underbrace{1\cdots11}_{L\text{ digits}})_2$ 内所有的数（最低位为第一维度），计算损耗使用上三角成对比较，规则统一为
     \begin{equation*}
         \texttt{compare}=
         \begin{cases}
@@ -147,9 +147,9 @@
     \subsection{运行时间}
 
     如果字符串平均长度为 $l$，该算法 $L$ 维字符串的复杂度为：
-    \begin{equation*}
-        O_S = \prod_{i=1}^L \texttt{len}(S[i]) = O(l^L)
-    \end{equation*}
+    \begin{equation}
+        O_S = (2^L-1)\prod_{i=1}^L \texttt{len}(S[i]) = O(l^L)
+    \end{equation}
 
     对于该问题，有 $m$ 个待比对序列，$n$ 个数据库项目，总时间复杂度为：
     \begin{equation*}
@@ -262,9 +262,9 @@
     \subsection{运行时间}
 
     该算法的时间复杂度，对于 $L$ 个字符串（平均长度为 $l$），每一步的分支因子为 $2^{L}-1$，单个实例需要花费时间
-    \begin{equation*}
+    \begin{equation}
      < l^L \times (2^L-1) = O(l^L)
-    \end{equation*}
+    \end{equation}
     因为这是一个树状结构的图，所以一定能够找到路径。扫描的节点数（第一项）要比动态规划小（如图 \ref{fig:path} 所示，由 \href{./compare.ipynb}{\ttfamily compare.ipynb} 生成），在常数级上会因为分支因子的多少而产生一定的差距。最多不会超过$\Theta((2^L-1)^{Ll})$（实际上应当多项式时间内即可，这个是 A* 的最差复杂度）。
 
     \begin{minipage}{0.5\textwidth}
@@ -292,9 +292,91 @@
 
     但是从图 \ref{fig:path} 我们可以看到这个版本的 A* 仅筛除了 30\% 左右的节点，导致其运行速度依然很慢。需要选择一个更好的启发函数 $h(n)$ 以解决这个问题。
 
-    启发函数可以使用轮换低维度反向损耗和以计算下界\cite{hastar}。
+    该部分算法实现于\filelink{msa\_hastar.py}。启发函数可以使用轮换低维度反向损耗和以计算下界\cite{hastar}。根据表 \ref{tab:dp}，二维动态规划是非常快的，尤其是使用专用加速的实现方法\filelink{msa\_dp.py}，那么启发函数就可以定义为二维反向损耗轮换和
+    \begin{equation*}
+        h(n) = \sum_{i = 1}^L\sum_{j = i+1}^L R_{i,j}[\texttt{pos}[i],\texttt{pos}[j]]
+    \end{equation*}
+    式中 $R_{i,j}$ 为字符串反置$\overline{S_i}$和$\overline{S_j}$的距离矩阵$M_{\overline{i},\overline{j}}$（由二维动态规划算法 \ref{alg:pairwise} 定义）的对角反置，矩阵中每个点表示该位置距离匹配完成（右下角）的最小损耗，即
+    \begin{equation*}
+        R_{i,j} = [M_{\overline{i},\overline{j}}^T[0],M_{\overline{i},\overline{j}}^T[1],\cdots,M_{\overline{i},\overline{j}}^T[L]]^T
+    \end{equation*}
 
-    % 7s
+    首先证明其\textbf{可满足性}。如图 \ref{fig:astarsat}，如果在高维空间中剩余字符串的最短路径在低维度上的投影就是对应低维度上的低维最短路径，那么这个启发函数就是剩余距离（轮换定义的不同计算方法）。但大部分情况下，这种投影并不是对应的，在低维度上的投影很有可能会绕一些\emph{远路}而比纯粹的低维度最短路径要长。所以轮换低维度最小损耗和是真正剩余损耗的下界。
+    \begin{equation*}
+        h(n)\leq \texttt{cost} - g(n)
+    \end{equation*}
+
+    再证明其\textbf{一致性}。如图 \ref{fig:astarcon}，采用\textbf{反证法}，如果不满足一致性，则存在一个状态，其
+    \begin{equation*}
+        h(n)-h(n^\prime)> c(n,a,n^\prime)
+    \end{equation*}
+    意味着其低维最短路投影损耗之和超过了高维单步损耗。
+    % 分为两种情况讨论：
+    % \begin{enumerate}
+    %     \item 如果高维单步投影到低维为一个间隙，这时不等式两边的贡献都是相等的 2，不会导致不等。
+    %     \item 
+    % \end{enumerate}
+    事实上，考虑不等式两边的低维度分量（因为都是轮换定义的）
+    \begin{equation*}
+        \sum_k M_k(n) - \sum_k M_k(n^\prime) > \sum_k c_k(n,a,n^\prime)
+    \end{equation*}
+    即
+    \begin{equation*}
+        \sum_k\left(M_k(n)-M_k(n^\prime)-c_k(n,a,n^\prime)\right)>0
+    \end{equation*}
+    下面再用\textbf{反证法}证明$0\geq M_k(n)-M_k(n^\prime)-c_k(n,a,n^\prime)$。由于在计算低维度$M$矩阵时，如果 $c_k(n,a,n^\prime)<M_k(n)-M_k(n^\prime)$，对$M$来说，$n$是$n^\prime$的后继节点（反置所致），由于 $c_k(n,a,n^\prime)+M_k(n^\prime)<M_k(n)$，那么经过$n^\prime$是$n$的最短路径，应当有$c_k(n,a,n^\prime)+M_k(n^\prime)=M_k(n)$产生了矛盾。所以
+    \begin{equation*}
+        0\geq\sum_k\left(M_k(n)-M_k(n^\prime)-c_k(n,a,n^\prime)\right)
+    \end{equation*}
+    至此，两个式子产生了矛盾，所以$h(n)$符合一致性。
+
+    \begin{figure}[H]
+        \centering
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \input{fig/astarsat.tex}
+            \caption{改进后启发函数可满足性}\label{fig:astarsat}
+        \end{minipage}
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \input{fig/astarcon.tex}
+            \caption{改进后启发函数一致性}\label{fig:astarcon}
+        \end{minipage}
+    \end{figure}
+
+    大致算法如算法 \ref{alg:hastar} 所示。在时间复杂度上的分析，需要首先计算上述的矩阵，之后见图 \ref{fig:path2} 可以看到基本上筛除了 90\% 以上的节点，对于真正的 A* 部分而言几乎就是线性时间。
+
+    \begin{equation}
+        \underbrace{\sum_{i=1}^L\sum_{j=i+1}^L 3l_il_j}_{DP} + \underbrace{(2^L-1)\sum_{i=1}^L l_i}_{A^*} \approx 3C_{L}^2 l^2 + (2^L-1)Ll = O(l^2)
+    \end{equation}
+
+    \begin{algorithm}[h]
+        \caption{改进后 A* 多序列比对}\label{alg:hastar}
+        根据算法 \ref{alg:pairwise}，计算每对反转字符串的距离矩阵$M$，并对角线反转得到 $R$\;
+        设定启发函数$h(n)$为对应坐标轮换对应的$R$矩阵值的和\;
+        按照算法 \ref{alg:astar}，进行 A* 运算\;
+    \end{algorithm}
+
+    \begin{minipage}{0.5\textwidth}
+        \begin{table}[H]
+            \centering
+            \caption{改进后 A* 运行时间}\label{tab:astar}
+            \begin{tabular}{ccc}
+                \toprule
+                 & 双序列比对 & 三序列比对 \\
+                \midrule
+                运行时间 & 7s & 3h30min \\
+                \bottomrule
+            \end{tabular}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{path2}
+            \caption{动态规划与改进后A*扫描节点数比较}\label{fig:path2}
+        \end{figure}
+    \end{minipage}
 
     \section{遗传算法}
 
@@ -356,6 +438,10 @@
             \bottomrule
         \end{tabular}
     \end{table}
+
+    \subsection{改进}
+
+    为了让遗传算法的收敛速度更快，需要对初始化种群的方法进行改进。
 
     \section{运行}
 
