@@ -36,7 +36,7 @@ def process2d(func, methodname):
                     if methodname == "ga":
                         pcost = costGA(func(S))
                     else:
-                        dist,move = func(S)
+                        dist,move = func(S[0],S[1]) if methodname=="dp" else func(S)
                         fin = tuple(len(s) for s in S)
                         pcost = visit(dist,fin)
                     if pcost < mincost:

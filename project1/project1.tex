@@ -167,7 +167,7 @@
              \cmidrule(r){2-3}\cmidrule(r){4-5} 
              & \bfseries 朴素实现 \href{./msa\_dp.py}{\ttfamily msa\_dp.py} &\bfseries \verb"list"实现 \href{./msa\_mdp.py}{\ttfamily msa\_mdp.py} &\bfseries \verb"list" 实现 \href{./msa\_mdp.py}{\ttfamily msa\_mdp.py} &\bfseries \verb"numpy" 实现 \href{./msa\_ndp.py}{\ttfamily msa\_ndp.py} \\
             \midrule
-            运行时间 & 29s & 1min & 48h & $\sim$72h \\
+            运行时间 & 3s & 33s & 48h & $\sim$72h \\
             \bottomrule
         \end{tabular}
     \end{table}
@@ -293,6 +293,8 @@
     但是从图 \ref{fig:path} 我们可以看到这个版本的 A* 仅筛除了 30\% 左右的节点，导致其运行速度依然很慢。需要选择一个更好的启发函数 $h(n)$ 以解决这个问题。
 
     启发函数可以使用轮换低维度反向损耗和以计算下界\cite{hastar}。
+
+    % 7s
 
     \section{遗传算法}
 

@@ -8,9 +8,7 @@ from msa_dp import editDistanceDP
 def editDistanceHASTAR(S):
     L = len(S)
 
-    # To shift the string starting from 1
-    S = ["-"+S[i] for i in range(L)]
-
+    # calculate the reverse before it is index-moved!
     SR = [S[i][::-1] for i in range(L)]
     pdists = []
     for i in range(L):
@@ -20,6 +18,9 @@ def editDistanceHASTAR(S):
             for k in range(len(pdist)):
                 pdist[k].reverse()  # column reverse
             pdists.append(pdist)
+
+    # To shift the string starting from 1
+    S = ["-"+S[i] for i in range(L)]
 
     def h(pos:tuple):
         """
