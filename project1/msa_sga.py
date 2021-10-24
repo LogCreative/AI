@@ -6,6 +6,11 @@ from msa_util import *
 from msa_dp import alignmentDP
 
 ####### SGA #######
+# Genetic Algorithm
+# Optimized by the paper Simple GA
+# which improves the initialization procedure
+# and the fitness function based on involution approach
+# to make the difference between different individuals more obvious.
 
 def initPopulationDP(S):
     L = len(S)

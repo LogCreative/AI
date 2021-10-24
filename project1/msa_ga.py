@@ -4,6 +4,9 @@ import time
 from msa_util import *
 
 ####### GA #######
+# Genetic Algorithm
+# Basic Implementation
+# without any optimization.
 
 def initPopulation(S):
     L = len(S)
@@ -69,9 +72,9 @@ def alignmentGA(S):
     L = len(S)
     population = initPopulation(S)
     pop_size = len(population)
-    fitness_thres = misalpha*L*(L-1)/2*len(population[0][0])*0.7
+    fitness_thres = misalpha*L*(L-1)/2*len(population[0][0])*0.6
     if L == 2: time_thres = 5
-    else: time_thres = 90
+    else: time_thres = 15
     start = time.process_time()
     same_count = 0
     prev_best = 0

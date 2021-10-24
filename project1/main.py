@@ -1,4 +1,9 @@
 # Main build script.
+# 
+# Process the database
+# and output the result.
+# You could select what algorithm to use
+# and what session (2d or 3d) for processing.
 
 import os, math
 from tqdm import tqdm
@@ -16,7 +21,7 @@ from msa_sga import alignmentSGA, costSGA
 def preprocessing():
     global curdir, pqs, mqs, targets
     # curdir = os.path.dirname(__file__) + "/"
-    curdir = ""
+    curdir = ""     # if you are python 3.6
 
     with open(curdir + "MSA_query.txt") as qf:
         queries = qf.read()

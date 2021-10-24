@@ -1,3 +1,8 @@
+# msa_util
+# 
+# This library provides the basic rule of the project
+# And some helper function that is in common.
+
 from numpy import uint8
 
 ####### Rules #######

@@ -2,6 +2,11 @@ import numpy as np
 from msa_util import *
 
 ####### NDP #######
+# Dynamic Programming Algorithm
+# Implemented in numpy library.
+# Numpy gives a simpler code for recursive calculation
+# but also costs more time.
+# However, it will not change the time scale of problem solving.
 
 # move will be encoded as binary, support up to 8 strings comparsion.
 # REMEMBER: the dimension has len + 1 length!

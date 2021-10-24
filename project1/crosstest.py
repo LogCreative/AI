@@ -1,3 +1,10 @@
+# crosstest
+# 
+# Based on unittest,
+# to test the result similarity 
+# between different implementations.
+# in reference of mdp method.
+
 import unittest,os
 
 from msa_dp import editDistanceDP

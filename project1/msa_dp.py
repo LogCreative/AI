@@ -1,7 +1,8 @@
 from msa_util import *
 
 ####### DP #######
-# This DP method is only available for 2d
+# Dynamic Programming Algorithm
+# This DP method is *only* available for 2d
 # To mainly accelerate other methods.
 # which has a slightly different interface.
 

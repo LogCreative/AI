@@ -1,6 +1,11 @@
 from msa_util import *
 
 ####### MDP #######
+# Dynamic Programming Algorithm
+# Adapt for multiple sequence alignment.
+# Based on list only, which gives a faster speed.
+# The tradeoff of implementing k MSA is that
+# the unpacking procedure costs more time.
 
 def editDistanceMDP(S):
     # Initialize l edges.

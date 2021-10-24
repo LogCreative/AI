@@ -4,6 +4,9 @@ from msa_util import *
 from msa_dp import editDistanceDP
 
 ####### HASTAR #######
+# A* Algorithm
+# with the optimization of heristic function h
+# based on the sum of cost of lower-fold.
 
 def editDistanceHASTAR(S):
     L = len(S)
