@@ -15,7 +15,8 @@ from msa_sga import alignmentSGA, costSGA
 
 def preprocessing():
     global curdir, pqs, mqs, targets
-    curdir = os.path.dirname(__file__) + "/"
+    # curdir = os.path.dirname(__file__) + "/"
+    curdir = ""
 
     with open(curdir + "MSA_query.txt") as qf:
         queries = qf.read()
@@ -59,29 +60,31 @@ def process2d(func, methodname):
 def process3d(func, methodname):
     with tqdm(total=int(len(mqs)*len(targets)*(len(targets)-1)/2), desc="Starting Up", leave=True, unit='str') as pbar:
         with open(curdir + methodname + "3d.txt","w") as of:
-            for mq in mqs:
-                minindex = (0,0)
-                mincost = math.inf
-                for i in range(len(targets)):
-                    for j in range(i+1,len(targets)):
-                        pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
-                        S = [mq,targets[i],targets[j]]
-                        if methodname == "ga":
-                            pcost = costGA(func(S))
-                        elif methodname == "sga":
-                            pcost = costSGA(func(S))
-                        else:
-                            dist,move = func(S)
-                            fin = tuple(len(s) for s in S)
-                            pcost = visit(dist,fin)
-                        if pcost < mincost:
-                            minindex = (i,j)
-                            mincost = pcost
-                        pbar.update(1)
-                if methodname == "ga" or methodname == "sga":
-                    minalign = func([mq,targets[minindex[0]],targets[minindex[1]]])
-                else:
-                    minalign = alignment([mq,targets[minindex[0]],targets[minindex[1]]],func)
+            of.write("")
+        for mq in mqs:
+            minindex = (0,0)
+            mincost = math.inf
+            for i in range(len(targets)):
+                for j in range(i+1,len(targets)):
+                    pbar.set_description('Process: ' + mq[:10] + ' & ' + targets[i][:10] + ' & ' + targets[j][:10])
+                    S = [mq,targets[i],targets[j]]
+                    if methodname == "ga":
+                        pcost = costGA(func(S))
+                    elif methodname == "sga":
+                        pcost = costSGA(func(S))
+                    else:
+                        dist,move = func(S)
+                        fin = tuple(len(s) for s in S)
+                        pcost = visit(dist,fin)
+                    if pcost < mincost:
+                        minindex = (i,j)
+                        mincost = pcost
+                    pbar.update(1)
+            if methodname == "ga" or methodname == "sga":
+                minalign = func([mq,targets[minindex[0]],targets[minindex[1]]])
+            else:
+                minalign = alignment([mq,targets[minindex[0]],targets[minindex[1]]],func)
+            with open(curdir + methodname + "3d.txt","a") as of:
                 of.write('\n'.join(minalign))
                 of.write('\n'+str(mincost)+"\n\n")
         pbar.set_description("Finish")

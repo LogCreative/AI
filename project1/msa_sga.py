@@ -75,9 +75,9 @@ def alignmentSGA(S):
     L = len(S)
     population = initPopulationDP(S)
     pop_size = len(population)
-    fitness_thres = misalpha*L*(L-1)/2*len(population[0][0])*0.35
+    fitness_thres = misalpha*L*(L-1)/2*len(population[0][0])*0.4
     if L == 2: time_thres = 5
-    else: time_thres = 20
+    else: time_thres = 15
     start = time.process_time()
     while (time.process_time()-start)<time_thres:      # set timer
         new_population = []
