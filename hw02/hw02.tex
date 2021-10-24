@@ -9,6 +9,24 @@
         尝试比较局部搜索算法（例如爬山法）与系统搜索算法（例如宽度优先搜索、A*算法）。
     \end{problem}
 
+    \begin{solution}
+        两者的比较如表 \ref{tab:compare} 所示。
+        \begin{table}[H]
+            \centering
+            \caption{比较}\label{tab:compare}
+            \begin{tabular}{>{\bfseries}cp{7.3cm}p{7.3cm}}
+                \toprule
+                    & \bfseries 局部搜索算法 & \bfseries 系统搜索方法 \\
+                \midrule
+                定义 & 考虑对一个或多个状态进行评价和修改 & 系统地探索从初始状态开始的路径 \\
+                特点 & 只使用很少的内存，找到合理的解 & 能够找到最优解 \\
+                复杂性 & 取决于解空间的分布与需要解的优性 & 需要全局扫描 \\
+                使用范围 & 在很大或无限的状态空间中需要合理解 & 在确定较小的空间中找到最优解 \\
+                \bottomrule
+            \end{tabular}
+        \end{table}
+    \end{solution}
+
     \begin{problem}
         我们希望使用爬山法解决一些最优化问题。
         \begin{enumerate}
@@ -16,6 +34,26 @@
             \item 使用爬山法搜索可能会遇到哪些问题？我们可以使用哪些更好的方法来代替？
         \end{enumerate}
     \end{problem}
+
+    \begin{solution}
+        \begin{enumerate}
+            \item 计算出梯度向量
+            \begin{equation*}
+                \nabla f = \left(\frac{\partial f}{\partial x},\frac{\partial f}{\partial y},\frac{\partial f}{\partial z}\right) = \left(e^x(xy+2z+y),e^xx,2e^x\right)
+            \end{equation*}
+            代入当前状态的值就给出了最陡斜面方向
+            \begin{equation*}
+                \nabla f(0,1,-1) = (-1,0,2)
+            \end{equation*}
+            \item 爬山法经常陷入困境：
+            \begin{itemize}
+                \item 局部最大值
+                \item 山脊
+                \item 平原
+            \end{itemize}
+            都会到达无法再取得进展的地点。\textbf{随机爬山法}在上山移动中随机地选择下一步；\textbf{随机重启爬山法}通过随机生成初始状态来导引爬山法搜索，直到找到目标，都是非常好的替代。
+        \end{enumerate}
+    \end{solution}
 
     \begin{problem}
         我们的minimax搜索树如图\ref{hw2-figure1}所示。
@@ -30,6 +68,29 @@
   \label{hw2-figure1}
 \end{figure}
     \end{problem}
+
+    \begin{solution}
+        \begin{enumerate}
+            \item a 为 32，如图 \ref{fig:p301} 所示。
+            \begin{figure}[H]
+                \centering
+                \input{fig/p301.tex}
+                \caption{题目3第(1)题}\label{fig:p301}
+            \end{figure}
+            \item 访问了 11 个节点。
+            
+            \begin{tabular}{l}
+                \toprule
+                a - c - f - 43 \\
+                a - c - f - 12 \\
+                a - c - g - 32 \\
+                a - c - g - 31 \\
+                a - b - d - 20 \\
+                a - b - d - 23 \\
+                \bottomrule
+            \end{tabular}
+        \end{enumerate}
+    \end{solution}
 
     \begin{problem}
         \indent 考虑一个这样的CSP问题：我们需要给变量\textit{$X_1, X_2, X_3, X_4$}赋值，需要满足以下约束：$(a)X_1\geq X_2, (b)X_2>X_3\ or\  X_3-X_2=2, (c)X_3\neq X_4, (d)X_1\neq X_3$。
@@ -53,7 +114,7 @@
     \hline 
      步骤& 需要检查的弧$X_i\rightarrow X_j$ & $X_i$值域的变化 & 添加进入搜索列的弧   \\
      \hline 
-     0 & $X_2\rightarrow X_1$ & 无变化  & 无 \\ \hline
+     0 & $X_2\rightarrow X_1$ & &  \\ \hline
      1 & $X_1\rightarrow X_2$ &  & \\ \hline
      2 & $X_3\rightarrow X_2$ &   &   \\ \hline
      3 & $X_2\rightarrow X_3$ &   &  \\ \hline
@@ -65,5 +126,32 @@
 \end{tabular}\\
 \end{center}
     \end{problem}
+
+    \begin{solution}
+        \begin{enumerate}
+            \item $X_3$
+            % \item $(X_1,X_3),(X_3,X_1),(X_2,X_3),(X_3,X_4),(X_4,X_3)$
+            \item $X_3\rightarrow X_1$,$X_1\rightarrow X_3$,$X_2\rightarrow X_3$,$X_4\rightarrow X_3$,$X_3\rightarrow X_4$
+            \item 
+            % $X\rightarrow Y\Leftrightarrow \forall x\in X \exists y \in Y$
+            \begin{center}
+                初始的搜索列：$\{ X_2\rightarrow X_1$, $X_1\rightarrow X_2$, $X_3\rightarrow X_2$, $X_2\rightarrow X_3$, $X_4\rightarrow X_3$, $X_3\rightarrow X_4$, $X_3\rightarrow X_1$, $X_1\rightarrow X_3 \}$。\\
+                \begin{tabular}{|c|c|c|c|}
+                    \hline 
+                     步骤& 需要检查的弧$X_i\rightarrow X_j$ & $X_i$值域的变化 & 添加进入搜索列的弧   \\
+                     \hline 
+                     0 & $X_2\rightarrow X_1$ & $X_2=\{3,4\}$  & 无（因为已经都加入了） \\ \hline
+                     1 & $X_1\rightarrow X_2$ & $X_1=\{3,4\}$ & $X_2\rightarrow X_1$ \\ \hline
+                     2 & $X_3\rightarrow X_2$ & $X_3=\{2,3,5,6\}$  & 无  \\ \hline
+                     3 & $X_2\rightarrow X_3$ & 无变化 & 无 \\ \hline
+                     4 & $X_4\rightarrow X_3$ &  无变化 & 无 \\ \hline
+                     5 & $X_3\rightarrow X_4$ &  无变化 & 无 \\ \hline
+                     6 & $X_3\rightarrow X_1$ &  无变化 & 无 \\ \hline
+                     7 & $X_1\rightarrow X_3$ & 无变化  & 无 \\ \hline
+                     ...& ... & ... & \qquad \qquad \qquad \quad ... \\ \hline
+                \end{tabular}\\
+                \end{center}
+        \end{enumerate}
+    \end{solution}
 
 \end{document}
