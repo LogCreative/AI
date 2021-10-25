@@ -96,6 +96,9 @@ def process3d(func, methodname):
 
 if __name__ == '__main__':
 
+    print("********************************************************************")
+    print("Recommended Configuration: dp for 2d and hastar for 3d, sga for GA.")
+    print("********************************************************************")
     choosemethod = input("Input the method (dp, mdp, ndp, astar, hastar, ga, sga):")
     choosedim = input("Input the dimension for analysis (2, 3):")
 

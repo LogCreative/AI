@@ -19,5 +19,6 @@ cache/
 *.bak
 *.sav
 ref/
+*.zip
 
 __pycache__
