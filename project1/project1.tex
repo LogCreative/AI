@@ -441,7 +441,7 @@
                 \toprule
                  & 双序列比对 & 三序列比对 \\
                 \midrule
-                运行时间 & 45min & 46h \\
+                运行时间 & 45min & 14h \\
                 \bottomrule
             \end{tabular}
         \end{table}
@@ -550,7 +550,7 @@
     \code{ga2d.txt}
     \code{mdp3d.txt}
     \code{hastar3d.txt}
-    % \code{sga3d.txt}
+    \code{sga3d.txt}
         
     \section{结论}
 
@@ -584,7 +584,7 @@
     \end{tikzpicture}
     \end{figure}
 
-    图 \ref{fig:result} 显示了运行结果的损耗统计图，根据上面的运行结果给出（请注意同族算法有多种实现，结果只给出其中一种）。可见动态规划和 A* 都给出了最优解，而遗传算法只能得到一个次优解，差距%
+    图 \ref{fig:result} 显示了运行结果的损耗统计图\footnote{二维查询图表（左图）遗传算法展示的是普通GA的结果。使用基于二维动态规划初始化的改进GA的运行结果显示于三维查询（右图），\textbf{虽然在二维情况下sga可以得到二维最优解}，但事实上本身就是基于二维动态规划计算的，所以就不在二维图表上展示这种``不公平''的结果。}，根据上面的运行结果给出（请注意同族算法有多种实现，结果只给出其中一种）。可见动态规划和 A* 都给出了最优解，而遗传算法只能得到一个次优解，但是差距在高维情况下已经不大，并且使用了比纯动态规划更少的时间（二维情况除外因为本身就是基于二维动态规划的初始化算法）。
 
     \begin{figure}[h]
         \caption{运行时间总计}\label{fig:time}
@@ -610,15 +610,17 @@
             ]
              \addplot+ [] coordinates { (mdp,48) (ndp,72)};
              \addplot+ [] coordinates { (astar,100) (hastar,3.5)};
-             \addplot+ [] coordinates { (ga,72) (sga,60)};
+             \addplot+ [] coordinates { (ga,72) (sga,14)};
             \end{axis}
             \end{tikzpicture}            
     \end{figure}
 
-    图 \ref{fig:time} 显示了各种实现的运行时间。\textbf{可见，在二维情景下，dp 是最快的；在三维场景下，hastar（根据二维dp改进的A*）是最快的。}现有的遗传算法实现在二维和三维中没有发挥其优势，主要受制于限制时间，其优势主要在高维时可以任意限制搜索时间，而不像传统的动态规划和 A* 算法需要等待结果返回。
+    图 \ref{fig:time} 显示了各种实现的运行时间。\textbf{可见，在二维情景下，dp 是最快的；在三维场景下，hastar（根据二维dp改进的A*）是最快的。}现有的遗传算法实现在二维和三维中没有发挥其优势，主要受制于限制时间，\textbf{遗传算法优势主要在高维时可以任意限制搜索时间}，而不像传统的动态规划和 A* 算法需要等待结果返回。
     
     其余的实现，基于 numpy 会一定程度上导致性能损耗，但是其代码可读性强。基于 list 实现的任意维度是一个比较好的折中，可以保证速度，又可以保证延展性。A* 的启发式函数需要认真选择，尽可能大又要满足限制。遗传算法的适应度函数需要尽可能体现出个体优越性，以更快地产生结果收敛。
 
+    \clearpage
+    
     \bibliography{ref}
 
 \end{document}
