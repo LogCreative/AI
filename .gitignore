@@ -21,4 +21,7 @@ cache/
 ref/
 *.zip
 
+group/lux
+*.json
+
 __pycache__
