@@ -240,20 +240,48 @@ $$(a\lor b)\land (\lnot a \lor c)\land (\lnot b \lor d)\land(\lnot c \lor g)\lan
 \indent 给定一个隐马尔可夫模型（HMM）。
 \begin{enumerate}
     \item 运用HMM的建模方式，用条件概率的计算方式推导并化简$P(x_1,...,x_t,y_{t-1}=s_v,y_t=s_j)$。\\
-\indent 提示：一般来说，我们会对HMM模型有以下的建模方式（与课件上一致)——$x_t$表示$t$时刻的观察状态，$y_t$表示$t$时刻的隐藏状态,隐藏状态可能取值为$\{1,2,3,\cdots, M \}$。初始状态的概率（start probabilities）表示为$\{ \pi_1, \cdots, \pi_M\}$，隐藏状态之间从状态$i$转化为状态$j$的转移概率（transition probabilities）为$a_{i,j}$，隐藏状态$y_j$与观察状态$x_i$之间的发散概率（emission probabilities）为$b_j(x_i)$。在使用前向算法推导序列概率的时候，设定的前向因子$ \alpha_t^i=P(x_1,...,x_t,y_t=s_i)$。
+\indent 提示：一般来说，我们会对HMM模型有以下的建模方式（与课件上一致)——$x_t$表示$t$时刻的观察状态，$y_t$表示$t$时刻的隐藏状态,隐藏状态可能取值为$\{1,2,3,\cdots, M \}$。初始状态的概率（start probabilities）表示为$\{ \pi_1, \cdots, \pi_M\}$，隐藏状态之间从状态$i$转化为状态$j$的转移概率（transition probabilities）为$a_{i,j}$，隐藏状态$y_i=s_j$与观察状态$x_i$之间的发散概率（emission probabilities）为$b_j(x_i)$。在使用前向算法推导序列概率的时候，设定的前向因子$ \alpha_t^i=P(x_1,...,x_t,y_t=s_i)$。
 \begin{solution}
-    
+    \begin{align*}
+        &P(x_1,...,x_t,y_{t-1}=s_v,y_t=s_j) \\
+        =& \sum_{y_1}\sum_{y_2}\cdots\sum_{y_{t-2}}\pi_{y_1}\times\prod_{\tau=2}^{t-2}a_{y_\tau,y_{\tau+1}}\times\prod_{\tau=1}^{t-2} P(x_\tau|y_\tau)\times a_{t-1,t} P(x_{t-1}|y_{t-1}=s_v) P(x_t|y_t=s_j)\\
+        =& a_{y_t-1=s_v,y_t=s_j} P(x_{t-1}|y_{t-1}=s_v) P(x_t|y_t=s_j) \sum_{i=1}^M\alpha_{t-2}^i\\
+        =& a_{y_t-1=s_v,y_t=s_j} b_{v}(x_{t-1})b_{j}(x_t)\sum_{i=1}^M\alpha_{t-2}^i
+    \end{align*}
+    其中
+    \begin{equation*}
+        \alpha_\tau^i = b_{i}(x_{\tau})\sum_{k=1}^M \alpha_{\tau-1}^k a_{k,i}
+    \end{equation*}
 \end{solution}
     \item 我们给定的HMM模型如下图\ref{hw3-figure2}所示。假定图中的圆圈表示$A, B, C$三种可能的隐藏状态，而圆圈中的数字表示特定隐藏状态下的观察状态以及其发射概率（emission probabilities）。圆圈之间的箭头表示隐藏状态的转移以及相应的转移概率（transition probabilities）。我们用$p_{y=A}^t$表示在$t$时刻，隐状态为$A$的概率，用$p_{x=1}^t$表示在$t$时刻，观察状态为$1$的概率。为了简便，我们规定初始的隐状态为$A$，即$p_A^1 = 1$。在每个时刻，隐状态会通过转移概率确定下个时刻的状态。\\
 \indent (a)请用图中给定的数值与符号计算$p_{y=C}^3$。\\
 \indent (b)假设在$t$时刻，$(p_{y=B}^t, p_{y=C}^t)$分别为$(b_0, c_0)$,请用图中给定的数值与符号计算$p_{x=2}^t$。
-\end{enumerate}
-\begin{figure}[!htbp]
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.8\linewidth]{hw3-figure2.jpg}
     \caption{第四题第二小问的HMM模型}
     \label{hw3-figure2}
 \end{figure}
+\begin{solution}
+    \begin{enumerate}
+        \item[(a)] 由于没有给定观察状态，所以
+        \begin{align*}
+            p_{y=C}^3 =& \sum_{y_1}\sum_{y_2} P(y_1)P(y_2|y_1)P(y_3=C|y_2)\\ 
+            =& \sum_{y=2} P(y_2|y_1=A)P(y_3=C|y_2)\\
+            =& P(y_2=A|y_1=A)P(y_3=C|y_2=A)+P(y_2=C|y_1=A)P(y_3=C|y_2=C)\\
+            =& A_1 A_2 + A_2 \times 0\\
+            =& A_1 A_2
+        \end{align*}
+        \item[(b)] 使用后向算法推算，其中$p_{y=A}^t=1-b_0-c_0$：
+        \begin{align*}
+            p_{x=2}^t =& \sum_{y=t}P(x_t=2,y_t)\\
+            =& \sum_{y=t}P(y_t)P(x_t=2|y_t)\\
+            =& P(y_t=A)P(x_t=2,y_t=A) + P(y_t=B)P(x_t=2,y_t=B) \\&+ P(y_t=C)P(x_t=2,y_t=C)\\
+            =& 0.3(1-b_0-c_0)
+        \end{align*} 
+    \end{enumerate}
+\end{solution}
+\end{enumerate}
 \end{problem}
 
 \end{document}
