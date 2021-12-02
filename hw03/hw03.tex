@@ -182,6 +182,12 @@ $$(a\lor b)\land (\lnot a \lor c)\land (\lnot b \lor d)\land(\lnot c \lor g)\lan
 \begin{enumerate}
     \item 采用拒绝采样的方法（rejection sampling）计算$P(-d|-b)$，请参照模型上方的示例写出采样过程（包括最后进行了几次采样，得到了怎样的样本）。采样时的随机数为$(0.31\rightarrow 0.58\rightarrow 0.04 \rightarrow 0.94 \rightarrow 0.67 \rightarrow 0.49\rightarrow 0.37 \rightarrow 0.42)$，且规定当随机数$r<P(+a)$时采样$+a$,当$r\geq P(+a)$时采样$-a$，随机数用完以后即废弃、当所有随机数用完整个算法停止。
     \begin{solution}
+        这里采用书上的拒绝采样算法，完成一次先验采样后，进行证据检测，与课件上有所不同。
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\linewidth]{rejsample}
+            \caption{书上拒绝采样算法}\label{fig:rejsample}
+        \end{figure}
         \begin{itemize}
             \item 随机数取$r=0.31<0.8$，因此对于节点$A$我们取$+a$。
             \item 随机数取$r=0.58<P(+b|+a)=0.8$，因此对于节点$B$我们取$+b$。
@@ -245,8 +251,8 @@ $$(a\lor b)\land (\lnot a \lor c)\land (\lnot b \lor d)\land(\lnot c \lor g)\lan
     \begin{align*}
         &P(x_1,...,x_t,y_{t-1}=s_v,y_t=s_j) \\
         =& \sum_{y_1}\sum_{y_2}\cdots\sum_{y_{t-2}}\pi_{y_1}\times\prod_{\tau=2}^{t-2}a_{y_\tau,y_{\tau+1}}\times\prod_{\tau=1}^{t-2} P(x_\tau|y_\tau)\times a_{t-1,t} P(x_{t-1}|y_{t-1}=s_v) P(x_t|y_t=s_j)\\
-        =& a_{y_t-1=s_v,y_t=s_j} P(x_{t-1}|y_{t-1}=s_v) P(x_t|y_t=s_j) \sum_{i=1}^M\alpha_{t-2}^i\\
-        =& a_{y_t-1=s_v,y_t=s_j} b_{v}(x_{t-1})b_{j}(x_t)\sum_{i=1}^M\alpha_{t-2}^i
+        =& a_{y_{t-1}=s_v,y_t=s_j} P(x_{t-1}|y_{t-1}=s_v) P(x_t|y_t=s_j) \sum_{i=1}^M\alpha_{t-2}^i\\
+        =& a_{y_{t-1}=s_v,y_t=s_j} b_{v}(x_{t-1})b_{j}(x_t)\sum_{i=1}^M\alpha_{t-2}^i
     \end{align*}
     其中
     \begin{equation*}
