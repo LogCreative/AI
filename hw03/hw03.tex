@@ -229,7 +229,7 @@ $$(a\lor b)\land (\lnot a \lor c)\land (\lnot b \lor d)\land(\lnot c \lor g)\lan
         固定$B=-b$，其余变量已经被初始化为$(+a,-b,+c,+d)$。
         \begin{itemize}
             \item 对$A$采样，$P(A| -b,+c)=\alpha P(A)P(-b|A)P(+c|A)=\alpha\langle 0.8\times 0.2\times 0.7, 0.2\times 0.5\times 0.1 \rangle=\alpha\langle 0.112, 0.01\rangle=\langle 0.918,0.082\rangle$，随机数$r=0.31<0.918=P(+a|-b,+c)$，所以$A$取$+a$。
-            \item 对$C$采样，$P(C| +a,-b,+d)=\alpha P(C|+a)P(+d|-b,C)=\alpha\langle 0.7\times 0.2, 0.3\times 0.9 \rangle=\alpha\langle 0.14,0.27 \rangle=\langle 0.58,0.42\rangle$，随机数$r=0.58>0.341$，所以$C$取$-c$。
+            \item 对$C$采样，$P(C| +a,-b,+d)=\alpha P(C|+a)P(+d|-b,C)=\alpha\langle 0.7\times 0.2, 0.3\times 0.9 \rangle=\alpha\langle 0.14,0.27 \rangle=\langle 0.341,0.659\rangle$，随机数$r=0.58>0.341$，所以$C$取$-c$。
             \item 对$D$采样，$P(D| -b,-c)=\langle 0.9,0.1 \rangle$，随机数 $r=0.04<0.9=P(+d|-b,-c)$，所以$D$取$+d$。
             \item 本次采样的结果为 $(+a,-b,-c,+d)$。
             \item 对$A$采样，$P(A| -b,-c)=\alpha P(A)P(-b|A)P(-c|A)=\alpha\langle 0.8\times 0.2\times 0.3, 0.2\times 0.5\times 0.9 \rangle=\alpha\langle 0.048,0.09\rangle=\langle 0.348,0.652\rangle$，随机数$r=0.94>0.348=P(+a|-b,-c)$，所以$A$取$-a$。
