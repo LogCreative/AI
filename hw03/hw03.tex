@@ -212,7 +212,7 @@ $$(a\lor b)\land (\lnot a \lor c)\land (\lnot b \lor d)\land(\lnot c \lor g)\lan
             \end{equation*}
             \item $C$不是一个证据变量，随机数取$r=0.58<0.7=P(+c|+a)$，因此对于节点$C$我们取$+c$。
             \item $D$不是一个证据变量，随机数取$r=0.04<0.2=P(+d| -b,+c)$，因此对于节点$D$我们取$+d$。\\
-            事件[true, false, true, true]以权值0.2被记录到$D=-d$中去。
+            事件[true, false, true, true]以权值0.2被记录到$D=+d$中去。
             \item 权值$w$为1.0。$A$不是一个证据变量，随机数取$r=0.94>0.8$，因此对于节点$A$我们取$-a$。
             \item $B$是一个证据变量，其值为 false，因此我们设置
             \begin{equation*}
@@ -221,18 +221,18 @@ $$(a\lor b)\land (\lnot a \lor c)\land (\lnot b \lor d)\land(\lnot c \lor g)\lan
             \item $C$不是一个证据变量，随机数取$r=0.67>0.1=P(+c|-a)$，因此对于节点$C$我们取$-c$。
             \item $D$不是一个证据变量，随机数取$r=0.49<0.9=P(+d| -b,-c)$，因此对于节点$D$我们取$+d$。\\
             事件[false, false, false, true]以权值0.5被记录到$D=+d$中去。
-            \item 采用了六个随机数，进行了两次采样，得到了2个样本（一个正样本、一个负样本），$P(-d|-b)=\alpha\langle0.2,0.5\rangle=\langle 0.286, 0.714\rangle$。
+            \item 采用了六个随机数，进行了两次采样，得到了2个负样本，概率为0。
         \end{itemize}
     \end{solution}
     \item 采用吉布斯采样的方法（Gibbs sampling）计算$P(-d|-b)$，请参照模型上方的示例写出采样过程（包括最后进行了几次采样，得到了怎样的样本）。采样时的随机数为$(0.31\rightarrow 0.58\rightarrow 0.04 \rightarrow 0.94 \rightarrow 0.67 \rightarrow 0.49)$，采样初时刻的节点取值初始化为$(+a, -b, +c, +d)$，且规定当随机数$r<P(+a)$时采样$+a$,当$r\geq P(+a)$时采样$-a$，随机数用完以后即废弃、当所有随机数用完整个算法停止。
     \begin{solution}
+        固定$B=-b$，其余变量已经被初始化为$(+a,-b,+c,+d)$。
         \begin{itemize}
-            固定$B=-b$，其余变量已经被初始化为$(+a,-b,+c,+d)$。
             \item 对$A$采样，$P(A| -b,+c)=\alpha P(A)P(-b|A)P(+c|A)=\alpha\langle 0.8\times 0.2\times 0.7, 0.2\times 0.5\times 0.1 \rangle=\alpha\langle 0.112, 0.01\rangle=\langle 0.918,0.082\rangle$，随机数$r=0.31<0.918=P(+a|-b,+c)$，所以$A$取$+a$。
             \item 对$C$采样，$P(C| +a,-b,+d)=\alpha P(C|+a)P(+d|-b,C)=\alpha\langle 0.7\times 0.2, 0.3\times 0.9 \rangle=\alpha\langle 0.14,0.27 \rangle=\langle 0.58,0.42\rangle$，随机数$r=0.58>0.341$，所以$C$取$-c$。
             \item 对$D$采样，$P(D| -b,-c)=\langle 0.9,0.1 \rangle$，随机数 $r=0.04<0.9=P(+d|-b,-c)$，所以$D$取$+d$。
             \item 本次采样的结果为 $(+a,-b,-c,+d)$。
-            \item 对$A$采样，随机数$r=0.94>0.918=P(+a|-b,+c)$，所以$A$取$-a$。
+            \item 对$A$采样，$P(A| -b,-c)=\alpha P(A)P(-b|A)P(-c|A)=\alpha\langle 0.8\times 0.2\times 0.3, 0.2\times 0.5\times 0.9 \rangle=\alpha\langle 0.048,0.09\rangle=\langle 0.348,0.652\rangle$，随机数$r=0.94>0.348=P(+a|-b,-c)$，所以$A$取$-a$。
             \item 对$C$采样，$P(C| -a,-b,+d)=\alpha P(C|-a)P(+d|-b,C)=\alpha\langle 0.1\times 0.2, 0.9\times 0.9\rangle=\alpha\langle 0.02,0.81 \rangle=\langle 0.024,0.976 \rangle$，随机数$r=0.67>P(+c|-a,-b,+d)=0.024$，所以$C$取$-c$。
             \item 对$D$采样，随机数$r=0.49<0.9=P(D|-b,-c)$，所以$D$取$+d$。
             \item 本次采样结果为 $(-a,-b,-c,+d)$。
