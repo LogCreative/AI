@@ -233,7 +233,7 @@ $$(a\lor b)\land (\lnot a \lor c)\land (\lnot b \lor d)\land(\lnot c \lor g)\lan
             \item 对$D$采样，$P(D| -b,-c)=\langle 0.9,0.1 \rangle$，随机数 $r=0.04<0.9=P(+d|-b,-c)$，所以$D$取$+d$。
             \item 本次采样的结果为 $(+a,-b,-c,+d)$。
             \item 对$A$采样，随机数$r=0.94>0.918=P(+a|-b,+c)$，所以$A$取$-a$。
-            \item 对$C$采样，$P(C| -a,-b,+d)=\alpha P(C|-a)P(+d|-b,C)=\langle 0.1\times 0.2, 0.9\times 0.9\rangle=\langle 0.02,0.81 \rangle=\langle 0.024,0.976 \rangle$，随机数$r=0.67>P(+c|-a,-b,+d)=0.024$，所以$C$取$-c$。
+            \item 对$C$采样，$P(C| -a,-b,+d)=\alpha P(C|-a)P(+d|-b,C)=\alpha\langle 0.1\times 0.2, 0.9\times 0.9\rangle=\alpha\langle 0.02,0.81 \rangle=\langle 0.024,0.976 \rangle$，随机数$r=0.67>P(+c|-a,-b,+d)=0.024$，所以$C$取$-c$。
             \item 对$D$采样，随机数$r=0.49<0.9=P(D|-b,-c)$，所以$D$取$+d$。
             \item 本次采样结果为 $(-a,-b,-c,+d)$。
             \item 采用六个随机数，进行了两次采样，得到了2个样本：$(+a,-b,-c,+d), (-a, -b, -c, +d)$ 皆为负样本。
