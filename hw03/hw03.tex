@@ -32,9 +32,14 @@ $$(a\lor b)\land (\lnot a \lor c)\land (\lnot b \lor d)\land(\lnot c \lor g)\lan
         \begin{equation*}
             C_{n}^2\times 2^2 = 2n(n-1)
         \end{equation*}
+
         可以相同符号语义不同的子句个数
         \begin{equation*}
             C_{n}^2\times 2^2 + n\times 3 = 2n^2 + n
+        \end{equation*}
+        但是这是不对的，$a\lor \neg a$ 和 $b \lor \neg b$ 属于相同的语义 true，所以
+        \begin{equation*}
+            C_{n}^2\times 2^2 + 2n + 1 = 2n^2 + 1
         \end{equation*}
     \end{enumerate}
 \end{solution}
