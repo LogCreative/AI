@@ -17,7 +17,7 @@
 根据以下的步骤完成神经网络反向传播的推导。假定一个前馈全连接神经网络的结果如下图所示，其中，$(x_{k-1, 1}, x_{k-1, 2}, \cdots, x_{k-1, N_{k-1}})$为该神经网络第$k-1$层共$N-1$个神经元的输出信号，并被输入第$k$层神经元。对于第$k$层的第$j$个神经元，根据神经网络的前向信号传播规律，我们规定
     \end{problem}
 \begin{equation}
-    net_{k,j} = [\sum_{i=1}^{N_{k-1}} (m_{k,j,i}\cdot x_{k, i}^3 + n_{k, j, i}\cdot x_{k, i})] + b_{k, j} 
+    net_{k,j} = [\sum_{i=1}^{N_{k-1}} (m_{k,j,i}\cdot x_{k-1, i}^3 + n_{k, j, i}\cdot x_{k-1, i})] + b_{k, j} 
 \end{equation}
 \begin{figure}[H]
     \centering
@@ -50,11 +50,11 @@
         \end{align*}
         \item \begin{align*}
             \frac{\partial E}{\partial m_{k,j,i}} &= \frac{\partial E}{\partial net_{k,j}}\frac{\partial net_{k,j}}{\partial m_{k,j,i}}\\
-            &= G_{k,j}x_{k,j}(1-x_{k,j})x_{k,i}^3
+            &= G_{k,j}x_{k,j}(1-x_{k,j})x_{k-1,i}^3
         \end{align*}
         \item \begin{align*}
             m_{k,j,i}^\prime &= m_{k,j,i} - \eta \frac{\partial E}{\partial m_{k,j,i}}\\
-            &= m_{k,j,i} - \eta G_{k,j}x_{k,j}(1-x_{k,j})x_{k,i}^3
+            &= m_{k,j,i} - \eta G_{k,j}x_{k,j}(1-x_{k,j})x_{k-1,i}^3
         \end{align*}
     \end{enumerate}
 \end{solution}
@@ -71,8 +71,8 @@
             & \bfseries 时间复杂度  & \bfseries 优点 & \bfseries 缺点 \\
         \midrule
         HAC &  $O(n^2)\sim O(n^3)$  & 可解释性好  & 需要计算每个样本间的距离，复杂度高   \\
-        $k$-means & $O(kmn)$ & 复杂度小  &  无法作用于非凸簇   \\
-        DBSCAN &  $O(n^2)$  & 聚类可以不局限于球形 & 需要手动选择参数 $\epsilon$ 和 MinPts  \\
+        $k$-means & $O(tkmn)$ & 复杂度小  &  无法作用于非凸簇   \\
+        DBSCAN &  $O(n\log n) \sim O(n^2)$  & 聚类可以不局限于球形 & 需要手动选择参数 $\epsilon$ 和 MinPts  \\
         \bottomrule
     \end{tabular}
 \end{solution}

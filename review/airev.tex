@@ -1,0 +1,431 @@
+\documentclass[10pt,a4paper]{ctexart}
+\pagestyle{plain}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+\geometry{left=1cm,right=1cm,top=1cm,bottom=1.5cm}
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+    language=c++,
+    mathescape=true,
+    showstringspaces=false,
+    showspaces=false,%
+    tabsize=2,%
+    basicstyle={\ttfamily\scriptsize},%
+    keywordstyle=\bfseries,%
+    identifierstyle=,%
+    commentstyle=\itshape,%
+    breaklines,
+    columns=flexible,
+    extendedchars=false
+}
+\usepackage{multicol}
+\usepackage{array}
+\usepackage{enumitem}
+\setlist{nosep}
+% \setlength{\parindent}{0pt}
+\linespread{1.1}
+\setlength{\parskip}{0.5em}
+\usepackage[colorlinks]{hyperref}
+\begin{document}
+    \title{Intro to AI}
+    \date{}
+    \begin{multicols}{3}
+        \maketitle
+
+        \section{人工智能概念}
+        \subsection{定义}
+        \textbf{人工智能} 人工设计程序，让机器可以像人一样智慧地行动。
+        也即\textbf{合理地行动}。
+        \subsection{图灵测试}
+        如果一位人类询问者在提出一些书面问题以后不能区分书面回答来自人还是来自计算机，那么这台计算机就通过测试。旨在设计测试以验证计算机是否真的具有智能。
+        \subsection{Agent}
+        \textbf{Agent} 通过传感器感知环境并通过执行器对所处环境产生影响。
+        
+        \textbf{理性 Agent} 是做事正确的 Agent------对每一个可能的感知序列，根据已知的感知序列提供的证据和 Agent 具有的先验知识，理性 Agent 应该选择能使其性能度量最大化的行动。
+        
+        任务环境的 \textbf{PEAS 描述}------\textbf{P}erformance, \textbf{E}nvironment, \textbf{A}ctuators, \textbf{S}ensors。
+
+        \subsection{环境}
+        \begin{itemize}
+            \item 完全可观察的与部分可观察的
+            \item 单 Agent 与多 Agent
+            \item 确定的与随机的
+            \item 片段式的与延续式的
+            \item 静态的与动态的
+            \item 离散的与连续的
+            \item[*] 已知的与未知的
+        \end{itemize}
+
+        \section{问题求解：搜索}
+        \subsection{搜索问题的建模方式}
+        \begin{itemize}
+            \item 初始状态
+            \item 行动
+            \item 转移模型
+            \item 目标测试
+            \item 路径耗散
+        \end{itemize}
+        \subsection{无信息搜索}
+        \textbf{广度优先搜索(BFS)}
+        先扩展根节点，然后扩展该节点的所有后继，每次纵使扩展深度最浅的节点。\emph{完备性} $b$有限时 \emph{时间复杂度} $O(b^d)$ \emph{空间复杂度} $O(b^d)$ \emph{最优性} 单步代价相同时
+        
+        \textbf{一致代价搜索(UCS)}
+        扩展路径消耗$g(n)$最小的节点$n$，使用优先队列实现，贪心。\emph{完备性} $b$有限且单步代价有正数下界$\epsilon$ \emph{时间复杂度} $O(b^{1+\lfloor C^*/\epsilon\rfloor})\approx O(b^d)$ \emph{空间复杂度} $O(b^{1+\lfloor C^*/\epsilon\rfloor})\approx O(b^d)$ \emph{最优性} 是
+
+        \textbf{深度优先搜索(DFS)}
+        总是扩展搜索树的当前边缘节点集中最深的节点。\emph{完备性} 在有限状态空间中避免重复状态与冗余路径的图搜索时 \emph{时间复杂度} $O(b^m)$ \emph{空间复杂度} $O(bm)$ \emph{最优性} 否（或许有浅层的最优解）
+
+        \textbf{深度限制搜索}
+        对深度优先搜索设置界限$l$。\emph{完备性} 否 \emph{时间复杂度} $O(b^l)$ \emph{空间复杂度} $O(bl)$ \emph{最优性} 否
+
+        \textbf{迭代加深搜索(IDS)}
+        不断地增大深度限制，直到找到目标。\emph{完备性} $b$有限时 \emph{时间复杂度} $O(b^d)$ \emph{空间复杂度} $O(bd)$ \emph{最优性} 单步代价相同时
+
+        \subsection{有信息搜索}
+        \textbf{有信息搜索（启发式搜索）}使用问题本身的定义之外的特定只是更有效地进行问题求解。使用启发函数 $h(n)$ 节点$n$到目标节点的最小代价路径的代价估计值。
+        
+        \textbf{贪婪最佳优先搜索}
+        试图扩展离目标最近的节点。只用启发式信息，$f(n)=h(n)$。\emph{完备性} 在有限状态空间中图搜索时 \emph{时间复杂度} $O(b^m)$ \emph{空间复杂度} $O(b^m)$ \emph{最优性} 否
+
+        \textbf{A*搜索}
+        评价函数$f(n)=g(n)+h(n)$为经过节点$n$的最小代价解的估计代价。\emph{完备性和最优性} 需要保证可采纳性（$f(n)$不会超过实际代价）和一致性$h(n)\leq c(n,a,n^\prime)+h(n^\prime)$。 \emph{时间复杂度} $O(b^{\epsilon d})$ \emph{空间复杂度} $O(b^{\epsilon d})$ 其中相对误差$\epsilon\equiv \frac{h^*-h}{h^*}$
+
+        \subsection{局部搜索}
+        \textbf{局部搜索}
+        考虑对一个或多个状态进行评价和修改，而不是系统地探索从初始状态开始的路径。这些算法使用于那些关注解状态而不是路径代价的问题。
+        
+        % \subsection{爬山法}
+        \textbf{爬山法}
+        是一个简单的循环过程，不断向值增加的方向持续移动，在到达一个峰顶时终止（邻接状态没有比它值更高的）。会在\textbf{局部最大值}、\textbf{山脊}、\textbf{高原}遇到问题。改进算法诸如\textbf{随机爬山法}、\textbf{随机重启爬山法}。
+
+        % \subsection{模拟退火搜索}
+        \textbf{模拟退火}
+        相对于爬山法没有使用最佳移动，选择随机移动，以适当弹出局部极小点。如果该移动使情况改善，则该移动被接受；否则，算法以某个小于1的概率$e^\frac{\Delta E}{T}$接受该移动。如果移动导致状态“变坏”，概率则成指数级下降。
+        
+        开始可能允许“坏的”移动，$T$的降低将会使其越不可能发生。如果调度让$T$下降的足够慢，算法找到全局最优解的概率逼近于1。
+
+        % \subsection{局部束搜索}
+        \textbf{局部束搜索}
+        记录$k$个状态而不是只记录一个。从$k$个随机生成的状态开始，每一步全部$k$个状态的所有后继状态全部被生成。如果其中有一个是目标状态，则算法停止。否则它从整个后继列表中选择$k$个最佳的后继，重复这个过程。
+        
+        这个过程中有用的信息在并行的搜索线程之间传递。改进有\textbf{随机束搜索}。
+        
+        % \subsection{遗传算法}
+        \textbf{遗传算法}
+        是随机束搜索的变形，通过把两个父状态结合来从生成后继，而不是通过修改单一状态进行。
+        
+        从$k$个随机生成的状态开始（\textbf{种群}），每一个\textbf{个体}用一个有限长度的字符串表示。每个状态都由他的\textbf{适应度函数}给出评估值，对于好的状态应当返回较高的值。根据评估值所得到的的概率随机地选择父本进行\textbf{繁殖}（\emph{将独立发展出来的能执行有用功能的字符区域结合起来，提高搜索粒度}），对于要配对的没对个体，在字符串中随机选择一个位置作为\textbf{杂交点}。最后，每个位置都会按照某个小的独立概率随机\textbf{变异}（\emph{提高随机性}）。
+
+        \subsection{对抗搜索}
+        \textsc{Minimax}\textbf{算法}
+        假设两个游戏者始终按照最优策略行棋，那么节点的极小极大值就是对应状态的效用值（对MAX而言）。
+        \begin{multline*}
+            \textsc{Minimax}(s)=\\\begin{cases}
+                \textsc{Utility}(s), & \text{终止}\\
+                \max_{a}\textsc{Minimax}(\textsc{Result}(s,a)) & \text{MAX}\\
+                \min_{a}\textsc{Minimax}(\textsc{Result}(s,a)) & \text{MIN}\\
+            \end{cases}
+        \end{multline*}
+
+        $\alpha-\beta$\textbf{剪枝} $\alpha$=到目前为止路径上发现的MAX的极大值选择，$\beta$=到目前为止路径上发现的MIN的极小值选择。这样可以将复杂度从 $O(b^m)$ 降低到 $O(b^{m/2})$。metareasoning 的一种形式。
+
+        \subsection{CSP 问题}
+        \textbf{约束满足问题}
+        当每个变量都有自己的赋值同时满足所有关于变量的约束时，问题得到解决。
+
+        \textbf{回溯算法}
+        用于深度优先搜索，每次为一变量选择一个赋值，当没有合法的值可以赋给某变量时就回溯。把叶子节点个数从$n!d^n$减少到$d^n$个。
+
+        \textsc{Select-Unassigned-Variable} 最受约束变量或最少剩余值（MRV）启发式。
+
+        \textsc{Inference} 前向检验：只要变量$X$被赋值了，前向检验过程对它进行弧相容检查：对每个通过约束与$X$相关的未赋值变量$Y$，从$Y$的值域中删除与$X$不相容的那些值。
+
+        \textbf{AC-3 算法}
+        维护一个弧相容队列。首先队列中包含CSP中所有弧，AC-3从队列中弹出弧$(X_i,X_j)$，首先使$X_i$相对$X_j$弧相容。如果$D_i$没有变化，算法则处理下一条弧。但如果$D_i$发生变化（变小），那么每个指向$X_i$（尾）的弧$(X_k,X_i)$都必须重新插入队列中准备检验。之所以这么做是因为$D_i$的改变可能引起$D_k$的缩小，如果$D_i$变成了空集，我们就知道整个CSP没有相容解，AC-3直接返回失败。否则，我们继续检查，试图缩小变量值域知道队列中没有弧。
+
+        \textbf{弧相容性}
+        $X_i\rightarrow X_j$，若对$D_i$中的每个数值在$D_j$中都存在一些数值满足弧$(X_i,X_j)$的二元约束，则称$X_i$相对$X_j$是弧相容的。
+
+        \section{知识表示、自动推理}
+        \subsection{一阶逻辑}
+        \textbf{一阶逻辑}
+        （一阶逻辑推算，FOL）是围绕对象、关系、函数建立起来的。
+
+        \textbf{符号}
+        常量符号（表示对象）、谓词符号（表示关系，Brother）、函词（表示函数）；变量、连接词、等价词、量词（$\forall,\exists$）。
+
+        $\Rightarrow$
+        蕴含，$\alpha\Rightarrow\beta$ iff $\alpha\land\neg\beta$是不可满足。
+
+        \subsection{知识表示}
+        \textbf{知识表示}
+        把知识转化为计算机可接受的符号，并以某种形式描述出来。知识的符号化过程。
+
+        \textbf{语义网络}
+        使用三种图形符号：框（节点）、带箭头及文字标识的线条（弧）和文字识别线（指针）。
+
+        \textbf{专家系统}
+        由知识库与推理引擎组成。根据一个或者多个专家提供的知识和经验，通过模拟专家的思维过程，进行主动推理和判断，解决问题。
+
+        \textbf{知识图谱}
+        以结构化的形式描述客观世界中概念、实体及其之间的关系，将互联网的信息表达成更接近人类认知世界的形式，提供了一种更好的组织、管理和理解互联网海量信息的能力。‘
+
+        \subsection{贝叶斯网络}
+        \textbf{概率}
+        \begin{equation*}
+            \begin{cases}
+                0\leq P(\omega)\leq 1,&\forall \omega\in\Omega\\
+                \sum_{\omega\in\Omega}P(\omega)=1&\\
+                P(\phi)=\sum_{\omega\in\phi}P(\omega)&
+            \end{cases}
+        \end{equation*}
+
+        \textbf{条件概率}（后验概率）
+        \begin{equation}\label{eq:condition}
+            P(a|b)=\frac{P(a\land b)}{P(b)}
+        \end{equation}
+
+        \textbf{联合概率}
+        \begin{align*}
+            \mathbf{P}(X,Y)&=\mathbf{P}(X|Y)\mathbf{P}(Y)\\
+            P(x_1,\cdots,x_n)&=\prod_{i=1}^nP(x_i|x_{i-1},\cdots,x_1)
+        \end{align*}
+        
+        \textbf{边缘化}（求和消元）
+        \begin{equation}\label{eq:margin}
+            \mathbf{P}(Y)=\sum_{z\in Z}\mathbf{P}(Y,z)
+        \end{equation}
+
+        \textbf{条件化}
+        \begin{equation*}
+            \mathbf{P}(Y)=\sum_{z}\mathbf{P}(Y|z)\mathbf{P}(z)
+        \end{equation*}
+
+        \begin{equation*}
+            \mathbf{P}(X|\mathbf{e})=\alpha\mathbf{P}(X,\mathbf{e})=\alpha\sum_{\mathbf{y}}\mathbf{P}(X,\mathbf{e},\mathbf{y})
+        \end{equation*}
+
+        \textbf{独立性}
+        \begin{align*}
+            P(a|b)&=P(a)\\
+            P(b|a)&=P(b)\\
+            P(a\land b)&=P(a)P(b)
+        \end{align*}
+
+        \textbf{贝叶斯规则}
+        \begin{align*}
+            P(b|a)&=\frac{P(a|b)P(b)}{P(a)}\\
+            \mathbf{P}(Y|X,\mathbf{e})&=\frac{\mathbf{P}(X|Y,\mathbf{e})\mathbf{P}(Y|\mathbf{e})}{\mathbf{P}(X|\mathbf{e})}
+        \end{align*}
+
+        \textbf{条件独立性}
+        \begin{equation*}
+            \mathbf{P}(X,Y|Z) = \mathbf{P}(X|Z)\mathbf{P}(Y|Z)
+        \end{equation*}
+
+        \textbf{朴素贝叶斯}
+        \begin{multline*}
+            \mathbf{P}(\mathit{Cause,Effect_1,\cdots,Effect_n})\\
+            =\mathbf{P}(\mathit{Cause})\prod_{i}\mathbf{P}(\mathit{Effect_i|Cause})
+        \end{multline*}
+
+        \textbf{贝叶斯网络联合概率因子分解}
+        \begin{equation}\label{eq:decomp}
+            P(x_1,\cdots,x_n)=\prod_{i=1}^nP(x_i|parents(X_i))
+        \end{equation}
+
+        \textbf{马尔科夫毯}
+        给定一个节点的父节点、子节点以及子节点的父节点，这个节点条件独立于网络中所有其他节点。条件独立性判断需要考虑 d-seperation。
+
+        \textbf{消元法}
+        保存中间结果。
+
+        \textbf{贝叶斯采样}
+        \begin{itemize}
+            \item 先验采样
+            \item 拒绝采样，拒绝所有与证据不匹配的样本
+            \item 似然采样，只生成证据一致事件，$w\leftarrow w\times P(X_i=x_i|parents(X_i))$
+            \item Gibbs采样，对$X_i$的采样条件依赖于$X_i$的\textbf{马尔科夫毯}中的变量的当前值，每次修改一个变量的值，但保持证据变量的值固定不变。条件概率计算：\eqref{eq:condition}, \eqref{eq:margin}, \eqref{eq:decomp}。
+        \end{itemize}
+
+        \subsection{HMM}
+        \textbf{隐马尔可夫模型}是用单个离散随机变量描述过程状态的时序概率模型。
+        \begin{equation*}
+            \begin{array}{ccccccc}
+                y_1 & \rightarrow & y_2 & \rightarrow & \cdots & \rightarrow & y_T \\
+                \downarrow & & \downarrow & & & & \downarrow \\
+                x_1 & & x_2 & & & & x_T  
+            \end{array}
+        \end{equation*}
+        \textbf{转移概率}
+        \begin{equation*}
+            P(y_t^j=1|y_{t-1}^i=1)=a_{i,j}
+        \end{equation*}
+        \textbf{发射概率}
+        \begin{equation*}
+            P(x_t|y_t^i=1)=b_{i,1}
+        \end{equation*}
+        \textbf{前向算法}（滤波与预测）
+        \begin{align*}
+            &P(y_{t+1}^k|x_{1:t+1})\\
+            &=\alpha^\prime P(x_{t+1}|y_{t+1}^k)\sum_{i}P(y_{t+1}^k|y_t^i)P(y_t^i|x_{1:t})\\
+            &\alpha_{t+1}^k=b\sum_i a^i \alpha_{t}^i\\
+            &\mathbf{f}_{1:t+1}=\alpha \textsc{Forward}(\mathbf{f}_{1:t},x_{t+1})
+        \end{align*}
+        \textbf{后向算法}（平滑）
+        \begin{equation*}
+            P(y_t^k|x_{1:t})=\alpha^\prime \alpha_t^k \beta_t^k
+        \end{equation*}
+        \begin{align*}
+            &P(x_{t+1:T}|y_t^k)\\
+            &=\sum_{i}P(x_{t+1}|y_{t+1}^i)P(x_{t+2:T}|y_{t+1}^i)P(y_{t+1}^i|y_{t}^k)\\
+            &\beta_{t}^k=\sum_{i}b^i\beta_{t+1}^i a^i\\
+            &b_{t+1:T} = \textsc{Backward}(b_{t+2:T},x_{t+1})
+        \end{align*}
+        \noindent
+        \begin{lstlisting}
+            fv=new int[t+1];    // foward messages
+            b=1;                // backward messages
+            sv=new vector[t+1]; // smoothed estimates
+
+            fv[0]=prior;
+            for(int i=1; i<=t; ++i)
+                fv[i]=forward(fv[i-1],x[i]);
+            for(int i=t; i>=1; --i){
+                sv[i]=normalize(fv[i]*b);
+                b=backward(b,x[i]);
+            }
+            return sv;
+        \end{lstlisting}
+        \textbf{维特比算法}（最可能解释）
+        \begin{multline*}
+            \max_{y_1,\cdots,y_{t-1}}P(y_1,\cdots,y_{t-1},y_{t}^k|x_{1:t})\\
+            =\alpha P(x_{t}|y_{t}^k)\max_{i}\Bigl[P(y_{t}^k|y_{t-1}^i)\\\max_{y_1,\cdots,y_{t-2}}P(y_1,\cdots,y_{t-2},y_{t-1}^i|x_{1:t-1})\Bigr]\\
+            V_{t}^k=b\max_i a^i V_{t-1}^i
+        \end{multline*}
+
+        \section{机器学习}
+        \subsection{强化学习}
+        \textbf{强化学习}
+        在强化序列（奖赏和惩罚组合的序列）中学习。任务是利用观察到的回报来学习针对某个环境的最优（或接近最优的）策略。
+
+        \textbf{马尔科夫过程}(MDP)
+        对于完全可观察的环境，使用马尔科夫链转移模型和累加回报这种序列式决策问题。
+
+        \textbf{效用}（贝尔曼方程）
+        在该状态得到的立即回报加上下一个状态的期望折扣效用值。
+        \begin{equation*}
+            U(s)=R(s)+\gamma\max_a\sum_s^\prime P(s^\prime|s,a)U(s^\prime)
+        \end{equation*}
+
+        \textbf{策略}
+        指定在Agent可能到达的任何状态下，Agent应当采取什么行动。
+
+        \textbf{价值迭代算法}
+        从任意的初始效用值开始，算出右边方程的值，再把它代入左边------从而根据他们的邻接状态的效用值来更新每个状态的效用值，直到达到一种均衡。
+
+        \textbf{策略迭代算法}
+        \begin{description}
+            \item[策略评估] 给定策略$\pi_i$，计算$U_i=U^{\pi_i}$
+            \item[策略改进] 通过基于$U_i$的向前看一步方法，计算新的MEU（最大期望效用 Max Expectation Utility）策略。 
+        \begin{equation*}
+            \pi^*(s)=\arg\max_a\sum_{s^\prime}P(s^\prime|s,a)U(s^\prime)
+        \end{equation*} 
+        \end{description}
+
+        \textbf{Q-Learning}
+        \begin{equation*}
+            U(s)=\max_a Q(s,a)
+        \end{equation*}
+
+        \subsection{机器学习}
+        \textbf{机器学习}
+        Machine Learning is a scientific discipline that explores the construction and study of algorithms that can learn from data.
+
+        \textbf{分类}
+        \begin{itemize}
+            \item 无监督学习
+            \item 强化学习
+            \item 监督学习
+        \end{itemize}
+
+        \textbf{预留法}随机将可用数据分为\textbf{训练集}和\textbf{测试集}。训练集用于学习算法产生$h$，测试集用于评估$h$的精度。
+        
+        \textbf{$k$折交叉验证}让每个样例都负担双重责任------既作为训练数据又作为测试数据，执行$k$轮次学习。极限情况下$k=n$，称为\textbf{留一交叉验证}。
+
+        为了避免偷窥，可以将真正不会用到的数据放在测试集，剩余的数据分为训练集和\textbf{验证集}。
+
+        \textbf{深度学习}
+        相比于浅层学习，学习多层表示和抽象，来学习更加复杂的场景。
+
+        \textbf{Bias-Variance 平衡}
+        \begin{equation*}
+            EL_2=\text{Bias}+\text{Variance}+\text{Noise}
+        \end{equation*}
+        \begin{itemize}
+            \item 高Bias会导致欠拟合
+            \item 高Variance会导致过拟合
+            \item Noise不可消除误差
+        \end{itemize}
+
+        \textbf{结构风险最小化}（SRM） Bias$^2$+Variance
+
+        \textbf{正则化}
+        将损耗和复杂性组合成一种量纲，从而允许我们一次性发现最佳假说，寻求更正规或更简单的函数。
+        \begin{align*}
+            \mathit{Cost}(h)&=\mathit{EmpLoss}(h)+\lambda\mathit{Complexity}(h)\\
+            \hat{h}^*&=\arg\min_h \mathit{Cost}(h)
+        \end{align*}
+
+        $L_1$\textbf{正则化}
+        极小化绝对值之和。$\mathit{Complexity}=\sum_i |w_i|$ 经常将很多权重置0，从而有效地说明对应属性是不合适的。
+
+        $L_2$\textbf{正则化}
+        极小化平方和。$\mathit{Complexity}=\sum_i w_i^2$ 是球面的，具有旋转不变性。
+
+        \textbf{特征选择}
+        用来丢弃看起来不适宜的属性，降低模型的维度。
+
+        \textbf{过拟合}
+        我们通过机器学习建立的模型对于训练数据拟合过当，导致其在训练集上的表现很好、但是在测试集与新数据上的表现较差。
+        \emph{策略}
+        获得更多的训练数据，从而减小噪声的影响; 提供数据的质量; 对原始数据的特征进行特征选择; 可以尝试限制模型的复杂度; 对模型加入加入正则化方法; 在训练过程中进行交叉验证，在训练过程中进行交叉验证。
+
+        \textbf{欠拟合}
+        我们通过机器学习建立的模型在训练集上未学习到足够的特征与规律，从而使得模型在训练集与测试集上表现都很差。
+        \emph{策略}
+        通过特征组合等方式，形成新的特征; 过增加模型的复杂度来使得模型有更强
+        的拟合能力; 正则化是用来防止过拟合的，但当模型出现欠拟合现象时，则需要有针对
+        性地减小正则化系数。       
+        
+        \subsection{神经网络}
+        \textbf{更新规则}
+        \begin{align*}
+            m^\prime &= m - \eta \frac{\partial E}{\partial m}\\
+                    &= m - \eta \frac{\partial E}{\partial net}\frac{\partial net}{\partial m}\\
+                    &= m - \eta \frac{\partial E}{\partial x}\frac{\partial x}{\partial net}\frac{\partial net}{\partial m}
+        \end{align*}
+
+        \subsection{无监督学习}
+        比如：聚类、降维、自监督学习。
+
+        \textbf{层次化聚类} $O(n^3)$ \emph{优点} 
+        简单直观，可解释性好，不需要提前假设任何超参数
+        \emph{缺点}
+        时间复杂度高；对于噪声非常敏感
+
+        \textbf{K-Means} $O(ikn)$ \emph{优点}
+        算法整体非常简单，时间复杂度小于层次化聚类；并且对于凸优化效果好
+        \emph{缺点}
+        算法中一些超参数难以决定（cluster 数目 $k$）；cluster 的初始中心点位置的选取对于算法结果很重要；噪声对算法结果影响大；不能处理离散太大的分类；不能处理非凸数据集
+
+        \textbf{DBSCAN} $O(n^2)$ \emph{优点}
+        对于噪声的容忍强，可以处理非凸集合，不用提前定义 cluster 的数目 $k$
+        \emph{缺点}
+        要提前定义半径 $\epsilon$ 与点数目 minpts DBSCAN 用固定参数识别聚类，但当聚类的稀疏程度不同时，相同的判定标准可能会破坏聚类的自然结构，即较稀的聚类会被划分为多个类或密度较大且离得较近的类会被合并成一个聚类        
+
+        \textbf{PCA} 无监督特征提取方法（降维），计算协方差。$(XX^T)v=\lambda v$，主元由特征值大的选取。
+        
+    \end{multicols}
+\end{document}
